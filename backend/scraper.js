@@ -10,8 +10,7 @@ const getListingDetails = async (page) => {
       const elementExists = (selector) => {
         return document.querySelector(selector) !== null;
       };
-  
-      // Using more robust selectors that are less likely to break
+
       const selectors = {
         price: ".MainContent_price__RSyWC span",
         discountedPrice: ".MainContent_price__RSyWC span.Price_onSale__qffVR",
@@ -64,31 +63,25 @@ const getListingDetails = async (page) => {
   };
   
   const handlePopups = async (page) => {
-      // Use a more general approach to handle various types of popups
       try {
         await page
           .waitForFunction(
             () => {
-              // Try to find and close any visible popups
               const possiblePopups = [
-                // Cookie consent buttons
                 document.querySelector('button:has-text("Accept")'),
                 document.querySelector('button:has-text("Accept All")'),
                 document.querySelector('button:has-text("I Accept")'),
                 document.querySelector(".cookie-notice button"),
     
-                // Login walls
                 document.querySelector(".auth-wall"),
                 document.querySelector(".login-modal"),
     
-                // Newsletter popups
                 document.querySelector(".newsletter-popup .close"),
                 document.querySelector(".modal .close-button"),
               ];
     
               for (const popup of possiblePopups) {
                 if (popup && popup.offsetParent !== null) {
-                  // Check if element is visible
                   popup.click();
                   return true;
                 }
@@ -102,7 +95,6 @@ const getListingDetails = async (page) => {
             console.log("No popups detected or timed out waiting for them")
           );
     
-        // Additional safety click in the top-left to dismiss non-button popups
         await page.mouse.click(50, 50);
     
         console.log("Popup handling complete");
@@ -125,7 +117,6 @@ const getListingDetails = async (page) => {
         );
     
         if (filterType.toLowerCase() === "condition") {
-          // Map "new" to "new/ never worn"
           if (value.toLowerCase() === "new") {
             value = "new/ never worn";
           }
@@ -181,7 +172,6 @@ const getListingDetails = async (page) => {
           return;
         }
     
-        // ... [rest of the filter application logic stays the same]
       } catch (e) {
         console.error(`Error applying ${filterType} filter:`, e);
       }
@@ -271,7 +261,7 @@ const scrapeMultipleListings = async (browser, links, batchSize = 5) => {
 
 const scrapeGrailedListing = async (listingUrl) => {
   const browser = await puppeteer.launch({
-    headless: false, // Set to false if you want to see the browser
+    headless: false, 
     defaultViewport: null,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });

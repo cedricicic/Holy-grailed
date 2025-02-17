@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, HashRouter, useLocation } from "react-router-dom";
-import Report from "./components/jsx/Report-doc.jsx";
 import RecentlyViewed from "./components/jsx/RecentlyViewed.jsx"
 import Hero from "./components/jsx/Hero.jsx";
 import Navbar from "./components/jsx/navbar.jsx";
