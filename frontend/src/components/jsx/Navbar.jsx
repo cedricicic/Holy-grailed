@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../css/navbar.css';
 
 const Navbar = () => {
@@ -7,6 +8,7 @@ const Navbar = () => {
   const [scrapeResult, setScrapeResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (alert) {
@@ -34,6 +36,9 @@ const Navbar = () => {
       });
       setScrapeResult(response.data);
       console.log("Scrape result:", response.data);
+      
+      // Redirect to results page with the data
+      navigate('/resultspage', { state: { scrapeResult: response.data } });
     } catch (error) {
       console.error("Error during scraping:", error);
       setAlert({
@@ -42,6 +47,13 @@ const Navbar = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!isLoading) {
+      fetchScrape();
     }
   };
 
@@ -59,9 +71,9 @@ const Navbar = () => {
         }
         
         .alert-error {
-          background-color:rgb(173, 173, 173);
-          border-left: 4px solidrgb(36, 36, 36);
-          color:rgb(0, 0, 0);
+          background-color: #FEECEC;
+          border-left: 4px solid #F44336;
+          color: #D32F2F;
         }
         
         .alert-icon {
@@ -98,7 +110,7 @@ const Navbar = () => {
         </div>
         
         <div className="navbar-search">
-          <div className="search-wrapper">
+          <form className="search-wrapper" onSubmit={handleSubmit}>
             <input 
               type="text" 
               placeholder="Paste in your listing URL" 
@@ -106,13 +118,13 @@ const Navbar = () => {
               onChange={(e) => setListingUrl(e.target.value)}
             />
             <button 
+              type="submit"
               className="search-button"
-              onClick={fetchScrape}
               disabled={isLoading}
             >
               {isLoading ? "LOADING..." : "SEARCH"}
             </button>
-          </div>
+          </form>
         </div>
         
         <div className="navbar-actions">
@@ -145,13 +157,6 @@ const Navbar = () => {
           <button className="alert-close" onClick={() => setAlert(null)}>
             ×
           </button>
-        </div>
-      )}
-
-      {scrapeResult && (
-        <div className="scrape-results">
-          <h3>Scrape Result:</h3>
-          <pre>{JSON.stringify(scrapeResult, null, 2)}</pre>
         </div>
       )}
     </nav>

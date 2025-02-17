@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, HashRouter, useLocation } from 
 import RecentlyViewed from "./components/jsx/RecentlyViewed.jsx"
 import Hero from "./components/jsx/Hero.jsx";
 import Navbar from "./components/jsx/navbar.jsx";
+import Results from "./components/jsx/Results.jsx";
 import RecentSearches from "./components/jsx/RecentSearches.jsx";
 
 function Home() {
@@ -11,6 +12,15 @@ function Home() {
       <Navbar />
       <Hero />
       <RecentlyViewed />
+    </>
+  );
+}
+
+function ResultsPage() {
+  return (
+    <>
+      <Navbar />
+      <Results />
     </>
   );
 }
@@ -28,7 +38,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/report" element={<Reporter />} />
+        <Route path="/resultspage" element={<ResultsPage />} />
       </Routes>
     </>
   );
