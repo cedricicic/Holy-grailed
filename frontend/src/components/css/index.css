@@ -1,0 +1,11 @@
+
+* {
+    font-family: 'SFProBold', sans-serif;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    font-family: 'SFProBold', sans-serif;
+    background-color: #D9D9D9;
+}

@@ -1,0 +1,200 @@
+.navbar {
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.8rem 1rem;
+  }
+  
+  .navbar-logo h1 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 0;
+  }
+  
+  .navbar-logo a {
+    text-decoration: none;
+    color: black;
+  }
+  
+  .navbar-search {
+    flex: 1;
+    max-width: 500px;
+    margin: 0 2rem;
+  }
+  
+  .search-wrapper {
+    display: flex;
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-wrapper input {
+    flex: 1;
+    outline: none;
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.9rem;
+  }
+  
+  .search-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0 1rem;
+    cursor: pointer;
+  }
+  
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-actions a {
+    margin-left: 1.5rem;
+    text-decoration: none;
+    color: black;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .action-button {
+    border: 1px solid black;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .signup-button {
+    background-color: black;
+    color: white !important;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .navbar-categories {
+    border-top: 1px solid #eee;
+  }
+  
+  .navbar-categories ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0.6rem 0;
+  }
+  
+  .navbar-categories li {
+    margin: 0 1.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+  
+  .navbar-categories a {
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+  }
+  
+  .dropdown {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dropdown-icon {
+    font-size: 0.6rem;
+    margin-left: 0.3rem;
+    color: #666;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-container {
+      flex-wrap: wrap;
+    }
+    
+    .navbar-search {
+      order: 3;
+      margin: 0.8rem 0 0;
+      max-width: 100%;
+    }
+    
+    .navbar-actions {
+      flex-wrap: wrap;
+    }
+    
+    .navbar-actions a {
+      margin: 0.3rem 0.7rem 0.3rem 0;
+    }
+    
+    .navbar-categories ul {
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding: 0.6rem 1rem;
+    }
+    
+    .navbar-categories li {
+      margin: 0 1rem 0 0;
+      white-space: nowrap;
+    }
+  }
+
+  /* Add these styles to your existing navbar.css */
+
+.search-wrapper input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #505050;
+  border-radius: 3px 0 0 3px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.search-button {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #505050; /* Adds a border */
+    border-left: none; /* Prevents double border between input and button */
+    color: rgb(0, 0, 0);
+    padding: 0.6rem 1rem;
+    border-radius: 0 3px 3px 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+.search-button:hover {
+  background-color: #333;
+  color: rgb(255, 255, 255);
+}
+
+.search-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.scrape-results {
+  margin: 1rem auto;
+  max-width: 1200px;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  overflow: auto;
+}
+
+.scrape-results pre {
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
