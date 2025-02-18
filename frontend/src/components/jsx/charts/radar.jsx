@@ -46,7 +46,7 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
     .style('color', 'white')
     .style('padding', '6px')
     .style('border-radius', '3px')
-    .style('font-size', '10px')
+    .style('font-size', '15px')
     .style('pointer-events', 'none')
     .style('opacity', 0)
     .style('z-index', 1000);

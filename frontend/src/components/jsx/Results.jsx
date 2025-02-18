@@ -163,7 +163,7 @@ const ResultsPage = () => {
         <div className="listing-info-panel">
           <div className="listing-card">
             <div className="listing-details">
-              <p className="price">{originalListing.labels}</p>
+            <p className="price">{originalListing.labels.join(' x ')}</p>
               <p>{originalListing.description || "N/A"}</p>
               <p>
                 <span>Colour:</span> {originalListing.colour || "N/A"}
