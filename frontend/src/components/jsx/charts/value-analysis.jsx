@@ -255,6 +255,13 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
         </div>
 
         <div className="metric">
+  <h3>Price Volatility</h3>
+  <p className="metric-value">
+    {parseFloat((calculations.marketVolatility * 100).toFixed(2))}%
+  </p>
+</div>
+
+        <div className="metric">
           <h3>Market Positioning</h3>
           <p>
             {parseFloat(calculations.priceDeviation) > 0

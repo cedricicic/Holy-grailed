@@ -5,6 +5,7 @@ import NetworkChart from "./charts/network.jsx";
 import PriceHistogram from "./charts/price-histogram.jsx";
 import ValueAnalysis from "./charts/value-analysis.jsx";
 import BubbleChart from "./charts/bubble.jsx";
+import PriceTugOfWar from './charts/PriceTugOfWar.jsx'
 import "../css/resultspage.css";
 
 const ResultsPage = () => {
@@ -66,6 +67,10 @@ const ResultsPage = () => {
       originalListing={originalListing}
       relatedListings={relatedListings}
     />,
+    <PriceTugOfWar 
+  originalListing={originalListing} 
+  relatedListings={relatedListings} 
+/>,
   ];
 
   const navigateCard = (direction) => {
