@@ -84,7 +84,7 @@ const NetworkChart = ({ data }) => {
       .attr('transform', `translate(${legendPadding}, ${height - legendPadding})`);
 
     legend.append('rect')
-      .attr('width', 180)
+      .attr('width', 200)
       .attr('height', topFiveTags.length * 20 + 25)
       .attr('y', -topFiveTags.length * 20 - 10)
       .attr('rx', 5)
@@ -144,7 +144,7 @@ const NetworkChart = ({ data }) => {
       .data(nodesArray)
       .enter().append('text')
       .attr('dy', -12)
-      .attr('font-size', `${nodeCount > 50 ? 12 / Math.log(nodeCount / 10) : 12}px`)
+      .attr('font-size', `${nodeCount > 50 ? 14 / Math.log(nodeCount / 10) : 16}px`)
       .attr('text-anchor', 'middle')
       .attr('fill', '#333')
       .text(d => d.id);
