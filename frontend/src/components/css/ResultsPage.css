@@ -258,3 +258,12 @@
 .follow-btn:hover {
   background-color: #333;
 }
+
+.note{
+  text-align: left;
+  font-weight: 800;
+}
+
+.note2{
+  text-align: left;
+}

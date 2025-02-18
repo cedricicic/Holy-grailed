@@ -239,7 +239,7 @@ const getListingDetails = async (page) => {
     console.log(
       `Finished gathering links. Found ${listingLinks.length} unique valid listings.`
     );
-    return listingLinks.slice(0, 20);
+    return listingLinks.slice(0, 30);
   };
 
 const scrapeListingDetails = async (browser, link) => {

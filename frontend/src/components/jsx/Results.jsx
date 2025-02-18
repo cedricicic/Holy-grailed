@@ -189,6 +189,8 @@ const ResultsPage = () => {
 </button>
             </div>
           </div>
+          <p className='note'> Note that we are comparing your listing with the top 30 TRENDING related listings.</p>
+          <p className='note2'>Please click on "DOWNLOAD LISTINGS" to see them in details.</p>
         </div>
 
         <div className="charts-container">
