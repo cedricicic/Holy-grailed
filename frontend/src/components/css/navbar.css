@@ -85,6 +85,7 @@
   
   .navbar-categories {
     border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
   }
   
   .navbar-categories ul {
@@ -112,13 +113,7 @@
     display: flex;
     align-items: center;
   }
-  
-  .dropdown-icon {
-    font-size: 0.6rem;
-    margin-left: 0.3rem;
-    color: #666;
-  }
-  
+
   @media (max-width: 768px) {
     .navbar-container {
       flex-wrap: wrap;
