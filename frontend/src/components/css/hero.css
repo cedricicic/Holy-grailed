@@ -28,3 +28,9 @@
     font-family: "SF Pro Text", -apple-system, Helvetica, Arial, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
 }
 
+.more{
+    text-align: center;
+    justify-content: center;
+    font-style: italic;
+}
+

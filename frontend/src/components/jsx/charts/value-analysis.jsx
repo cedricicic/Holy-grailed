@@ -257,7 +257,7 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
         <div className="metric">
   <h3>Price Volatility</h3>
   <p className="metric-value">
-    {parseFloat((calculations.marketVolatility * 100).toFixed(2))}%
+    {parseFloat((calculations.marketVolatility * 1).toFixed(2))}%
   </p>
 </div>
 

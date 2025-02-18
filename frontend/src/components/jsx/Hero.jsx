@@ -4,6 +4,7 @@ import '../css/hero.css'
 
 const Hero = () => {
     return (
+      <>
       <section className="hero">
         <video autoPlay loop muted className="background-video">
           <source src={videoFile} type="video/mp4" />
@@ -13,6 +14,8 @@ const Hero = () => {
           <h3>Compare your listing with trending ones</h3>
         </div>
       </section>
+      <p className='more'> *** more features coming soon ***</p>
+      </>
     );
   };
   
