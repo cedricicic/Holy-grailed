@@ -13,12 +13,15 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
     // Clean up previous SVG content
     d3.select(svgRef.current).selectAll('*').remove();
 
+    // Define overall dimensions and margins
+    const outerWidth = 500;
+    const outerHeight = 400;
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-    const width = 600 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    const width = outerWidth - margin.left - margin.right;
+    const height = outerHeight - margin.top - margin.bottom;
 
     // Parse prices
-    const prices = relatedListings.map(item => 
+    const prices = relatedListings.map(item =>
       parseFloat(item.price.replace('$', '').replace(',', ''))
     );
     const originalPrice = parseFloat(originalListing.price.replace('$', '').replace(',', ''));
@@ -28,10 +31,12 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
     const stdDev = d3.deviation(prices) || 0;
     const median = d3.median(prices);
 
-    // Create the SVG container
+    // Create the SVG container with viewBox for scaling
     const svg = d3.select(svgRef.current)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', `0 0 ${outerWidth} ${outerHeight}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -46,17 +51,15 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .range([height, 0]);
 
     // Generate normal distribution curve data
-    const normalDist = d3.range(mean - 3 * stdDev, mean + 3 * stdDev, stdDev / 20).map(xValue => {
-      return {
-        x: xValue,
-        y: (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((xValue - mean) / stdDev) ** 2)
-      };
-    });
+    const normalDist = d3.range(mean - 3 * stdDev, mean + 3 * stdDev, stdDev / 20).map(xValue => ({
+      x: xValue,
+      y: (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((xValue - mean) / stdDev) ** 2)
+    }));
 
-    // Line generator
+    // Line generator for the curve
     const line = d3.line()
       .x(d => x(d.x))
-      .y(d => y(d.y / d3.max(normalDist, d => d.y))) // Normalize the y values
+      .y(d => y(d.y / d3.max(normalDist, d => d.y))) // normalize the y values
       .curve(d3.curveBasis);
 
     // Draw normal distribution curve
@@ -114,38 +117,31 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("font-size", "15px")
       .text("Median Price");
 
-    // Add mouse tracking line and tooltip
+    // Add mouse tracking line and tooltip effects
     const mouseG = svg.append("g")
       .attr("class", "mouse-over-effects");
 
-    mouseG.append("path") // This is the black vertical line to follow mouse
+    mouseG.append("path") // vertical line to follow mouse
       .attr("class", "mouse-line")
       .style("stroke", "black")
       .style("stroke-width", "1px")
       .style("opacity", "0");
 
-    const mousePerLine = mouseG.append('g')
-      .attr('class', 'mouse-per-line');
-
-    mousePerLine.append('text')
-      .attr('class', 'mouse-text')
-      .attr('transform', 'translate(10,0)');
-
-    mouseG.append('rect') // append a rect to catch mouse movements on canvas
-      .attr('width', width) // can't catch mouse events on a g element
+    mouseG.append('rect') // rectangle to capture mouse movements
+      .attr('width', width)
       .attr('height', height)
       .attr('fill', 'none')
       .attr('pointer-events', 'all')
-      .on('mouseout', function() { // on mouse out hide line, circles and text
+      .on('mouseout', function() {
         d3.select('.mouse-line')
           .style('opacity', '0');
         setMousePosition(null);
       })
-      .on('mouseover', function() { // on mouse in show line, circles and text
+      .on('mouseover', function() {
         d3.select('.mouse-line')
           .style('opacity', '1');
       })
-      .on('mousemove', function(event) { // mouse moving over canvas
+      .on('mousemove', function(event) {
         const mouse = d3.pointer(event);
         const mouseX = mouse[0];
         const priceAtMouse = x.invert(mouseX);
@@ -154,29 +150,23 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
         setMousePosition({ price: priceAtMouse, stdDev: stdDevAtMouse });
 
         d3.select('.mouse-line')
-          .attr('d', function() {
-            let d = 'M' + mouseX + ',' + height;
-            d += ' ' + mouseX + ',' + 0;
-            return d;
-          });
-
-        // d3.select('.mouse-text')
-        //   .text(`Price: $${priceAtMouse.toFixed(2)}, Std Dev: ${stdDevAtMouse.toFixed(2)}`)
-        //   .attr('transform', `translate(${mouseX + 10},${20})`);
+          .attr('d', `M${mouseX},${height} ${mouseX},0`);
       });
 
   }, [originalListing, relatedListings]);
 
   return (
-    <div className="chart-container">
-      <h3>Price Distribution (Normal Curve)</h3>
-      <svg ref={svgRef}></svg>
-      {mousePosition && (
-        <div style={{ marginTop: '10px' }}>
-          <strong>Price:</strong> ${mousePosition.price.toFixed(2)}, <strong>Std Dev:</strong> {mousePosition.stdDev.toFixed(2)}
-        </div>
-      )}
-    </div>
+    <>      <h2>Price Distribution (Normal Curve)</h2>
+        <div className="chart-container" style={{ width: '500px', height: '500px', margin: '0 auto' }}>
+
+<svg ref={svgRef}></svg>
+{mousePosition && (
+  <div style={{ marginTop: '10px' }}>
+    <strong>Price:</strong> ${mousePosition.price.toFixed(2)}, <strong>Std Dev:</strong> {mousePosition.stdDev.toFixed(2)}
+  </div>
+)}
+</div></>
+
   );
 };
 

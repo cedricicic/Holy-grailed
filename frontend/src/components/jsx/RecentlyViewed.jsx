@@ -2,18 +2,20 @@ import React from 'react'
 import RecentSearches from "./RecentSearches"
 
 const RecentlyViewed = () => {
-    return (
-        <section>
-          <h3>Recently Viewed</h3>
-          <div>
-            <RecentSearches />
-            <RecentSearches />
-            <RecentSearches />
-            <RecentSearches />
-            <RecentSearches />
-          </div>
-        </section>
-      );
+    const sectionStyle = {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+      height: '70%',
     };
-
-export default RecentlyViewed
+  
+    return (
+      <section style={sectionStyle}>
+        <h3>*** More features coming soon ***</h3>
+      </section>
+    );
+  };
+  
+  export default RecentlyViewed;

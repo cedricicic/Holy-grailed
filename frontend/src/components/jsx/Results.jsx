@@ -11,6 +11,8 @@ const ResultsPage = () => {
   const location = useLocation();
   const scrapeResult = location.state?.scrapeResult;
   const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [buttonText, setButtonText] = useState('COPY LISTING');
+  const [downloadButtonText, setDownloadButtonText] = useState('DOWNLOAD LISTINGS');
 
   const calculatePercentile = (value, array) => {
     const sorted = [...array].sort((a, b) => a - b);
@@ -70,16 +72,6 @@ const ResultsPage = () => {
     }
   };
 
-  if (!scrapeResult) {
-    return <div className="no-results">No results found.</div>;
-  }
-
-  if (!originalListing || !relatedListings) {
-    return <div className="insufficient-data">Insufficient data to render the analysis.</div>;
-  }
-
-  const [buttonText, setButtonText] = useState('COPY LISTING');
-
   const handleCopy = () => {
     navigator.clipboard.writeText(originalListing.link)
       .then(() => {
@@ -88,6 +80,65 @@ const ResultsPage = () => {
       })
       .catch(err => console.error('Failed to copy: ', err));
   };
+
+  // Convert JSON to CSV
+  const convertToCSV = (objectArray) => {
+    if (!objectArray || objectArray.length === 0) return '';
+    
+    // Get headers from first object
+    const headers = Object.keys(objectArray[0]);
+    
+    // Create CSV rows with headers
+    const csvRows = [
+      headers.join(','), // Header row
+      ...objectArray.map(row => 
+        headers.map(fieldName => {
+          // Handle fields that might contain commas by wrapping in quotes
+          const value = row[fieldName] ? String(row[fieldName]) : '';
+          return `"${value.replace(/"/g, '""')}"`;
+        }).join(',')
+      )
+    ];
+    
+    return csvRows.join('\n');
+  };
+
+  // Handle download of listings as CSV
+  const handleDownload = () => {
+    if (!relatedListings || relatedListings.length === 0) {
+      console.error('No listings to download');
+      return;
+    }
+
+    // Prepare data - combine original listing with related listings
+    const allListings = [originalListing, ...relatedListings];
+    
+    const csvContent = convertToCSV(allListings);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'listings.csv');
+    
+    // Temporarily show feedback to user
+    setDownloadButtonText('Downloading...');
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Reset button text after download
+    setTimeout(() => setDownloadButtonText('DOWNLOAD LISTINGS'), 2000);
+  };
+
+  if (!scrapeResult) {
+    return <div className="no-results">No results found.</div>;
+  }
+
+  if (!originalListing || !relatedListings) {
+    return <div className="insufficient-data">Insufficient data to render the analysis.</div>;
+  }
 
   return (
     <div className="results-page">
@@ -110,12 +161,19 @@ const ResultsPage = () => {
               <br></br>
               <p className="price">{originalListing.price}</p>
             </div>
-            <div class="actions">
-              <button class="primary-btn">VIEW LISTING</button>
+            <div className="actions">
+              <button
+                className="primary-btn"
+                onClick={() => (window.location.href = originalListing.link)}
+              >
+                VIEW LISTING
+              </button>
               <button className="secondary-btn" onClick={handleCopy}>
-      {buttonText}
-    </button>
-              <button class="secondary-btn">DOWNLOAD LISTINGS</button>
+                {buttonText}
+              </button>
+              <button className="secondary-btn" onClick={handleDownload}>
+                {downloadButtonText}
+              </button>
             </div>
           </div>
         </div>

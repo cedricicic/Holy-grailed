@@ -7,6 +7,7 @@ const NetworkChart = ({ data }) => {
   useEffect(() => {
     if (!data || !networkGraphRef.current) return;
 
+    // Clear previous content
     networkGraphRef.current.innerHTML = '';
 
     let nodes = {};
@@ -33,13 +34,8 @@ const NetworkChart = ({ data }) => {
       return { source: parts[0], target: parts[1], value: value };
     });
 
-    const totalCount = nodesArray.reduce((acc, node) => acc + node.count, 0);
-
-    const container = d3.select(networkGraphRef.current);
-    const containerWidth = parseInt(container.style('width'));
-    const containerHeight = parseInt(container.style('height'));
-    const width = containerWidth || 800;
-    const height = containerHeight || 600;
+    const width = 500;
+    const height = 500;
 
     const tooltip = d3.select("body")
       .append("div")
@@ -61,6 +57,7 @@ const NetworkChart = ({ data }) => {
       .attr('viewBox', `0 0 ${width} ${height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet');
 
+    // Calculate node radii based on total number of nodes and counts
     const nodeCount = nodesArray.length;
     const baseMaxRadius = Math.min(width, height) / 15;
     const maxRadius = nodeCount > 50 ? baseMaxRadius / Math.log(nodeCount) : baseMaxRadius;
@@ -78,56 +75,50 @@ const NetworkChart = ({ data }) => {
       .alphaDecay(0.01)
       .alpha(1).restart();
 
-      svg.append('text')
-    .attr('x', 10)
-    .attr('y', 30)
-    .attr('font-size', '30px')
-    .attr('font-weight', 'bold')
-    .text('Network Chart');
+  
+    // Add top five tags legend
+    const topFiveTags = nodesArray
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
-  // Add top five tags legend
-  const topFiveTags = nodesArray
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    const legendPadding = 30;
+    const legend = svg.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${legendPadding}, ${height - legendPadding})`);
 
-  const legendPadding = 30;
-  const legend = svg.append('g')
-    .attr('class', 'legend')
-    .attr('transform', `translate(${legendPadding}, ${height - legendPadding})`);
+    // Legend background
+    legend.append('rect')
+      .attr('width', 180)
+      .attr('height', topFiveTags.length * 20 + 25)
+      .attr('y', -topFiveTags.length * 20 - 10)
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('fill', 'white')
+      .attr('opacity', 1)
+      .attr('stroke', 'black');
 
-  // Add legend background
-  legend.append('rect')
-    .attr('width', 180)
-    .attr('height', topFiveTags.length * 20 + 25)
-    .attr('y', -topFiveTags.length * 20 - 10)
-    .attr('rx', 5)
-    .attr('ry', 5)
-    .attr('fill', 'white')
-    .attr('opacity', 1)
-    .attr('stroke', 'black');
+    // Legend title
+    legend.append('text')
+      .attr('x', 5)
+      .attr('y', -topFiveTags.length * 20 + 5)
+      .text('Top 5 Designers:')
+      .attr('font-weight', 'bold')
+      .attr('font-size', '14px');
 
-  // Add legend title
-  legend.append('text')
-    .attr('x', 5)
-    .attr('y', -topFiveTags.length * 20 + 5)
-    .text('Top 5 Designers:')
-    .attr('font-weight', 'bold')
-    .attr('font-size', '14px');
-
-  // Add legend items
-  legend.selectAll('.legend-item')
-  .data(topFiveTags)
-  .enter()
-  .append('text')
-  .attr('class', 'legend-item')
-  .attr('x', 10)
-  .attr('y', (d, i) => -topFiveTags.length * 20 + 25 + i * 20)
-  .text(d => {
-    const percentage = ((d.count / data.length) * 100).toFixed(1); // Calculate percentage
-    return `${d.id} (${percentage}%)`; // Display percentage
-  })
-  .attr('font-size', '12px')
-  .attr('fill', '#333');
+    // Legend items
+    legend.selectAll('.legend-item')
+      .data(topFiveTags)
+      .enter()
+      .append('text')
+      .attr('class', 'legend-item')
+      .attr('x', 10)
+      .attr('y', (d, i) => -topFiveTags.length * 20 + 25 + i * 20)
+      .text(d => {
+        const percentage = ((d.count / data.length) * 100).toFixed(1);
+        return `${d.id} (${percentage}%)`;
+      })
+      .attr('font-size', '12px')
+      .attr('fill', '#333');
 
     const link = svg.append('g')
       .attr('stroke', '#999')
@@ -164,13 +155,6 @@ const NetworkChart = ({ data }) => {
       .attr('fill', '#333')
       .text(d => d.id);
 
-      svg.append('text')
-      .attr('x', 10)
-      .attr('y', 30)
-      .attr('font-size', '30px')
-      .attr('font-weight', 'bold')
-      .text('Network Chart');
-
     simulation.on('tick', () => {
       link.attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
@@ -185,20 +169,19 @@ const NetworkChart = ({ data }) => {
     });
 
     function showNodeTooltip(event, d) {
-        // Calculate the percentage based on the number of listings where the label appears
-        const percentage = ((d.count / data.length) * 100).toFixed(1); // Use data.length instead of totalCount
-        tooltip.transition()
-          .duration(200)
-          .style('opacity', 0.9);
-        tooltip.html(`<strong>${d.id}</strong><br>Count: ${d.count}<br>Percentage: ${percentage}%`)
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY - 28}px`);
-      
-        // Highlight connected links
-        link.style('stroke-opacity', l =>
-          l.source.id === d.id || l.target.id === d.id ? 0.9 : 0.2
-        );
-      }
+      const percentage = ((d.count / data.length) * 100).toFixed(1);
+      tooltip.transition()
+        .duration(200)
+        .style('opacity', 0.9);
+      tooltip.html(`<strong>${d.id}</strong><br>Count: ${d.count}<br>Percentage: ${percentage}%`)
+        .style('left', `${event.pageX + 10}px`)
+        .style('top', `${event.pageY - 28}px`);
+
+      // Highlight connected links
+      link.style('stroke-opacity', l =>
+        l.source.id === d.id || l.target.id === d.id ? 0.9 : 0.2
+      );
+    }
 
     function showLinkTooltip(event, d) {
       tooltip.transition()
@@ -215,12 +198,9 @@ const NetworkChart = ({ data }) => {
       tooltip.transition()
         .duration(500)
         .style('opacity', 0);
-
-      // Reset opacity
       link.style('stroke-opacity', 0.6);
     }
 
-    // Drag functions
     function dragstarted(event, d) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
@@ -239,7 +219,11 @@ const NetworkChart = ({ data }) => {
     }
   }, [data]);
 
-  return <div id="networkGraph" ref={networkGraphRef}></div>;
+  return(<> 
+        <h2>Network Chart</h2>
+  <div id="networkGraph" ref={networkGraphRef} style={{ width: '500px', height: '500px', margin: '0 auto' }}></div>
+    </>
+  ) 
 };
 
 export default NetworkChart;

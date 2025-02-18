@@ -10,40 +10,53 @@ const RadarChart = ({ pricePercentile, likesPercentile, photosPercentile }) => {
     }
   }, [pricePercentile, likesPercentile, photosPercentile]);
 
-  return <div id="radarChart" ref={radarChartRef}></div>;
+  return (
+    <>        <h2>Radar Chart</h2>
+        <div
+      id="radarChart"
+      ref={radarChartRef}
+      style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}
+    ></div>
+    </>
+
+  );
 };
 
 const createRadarChart = (target, pricePercentile, likesPercentile, photosPercentile) => {
-  const radarChart = document.getElementById('radarChart');
-  if (!radarChart || radarChart.querySelector('svg')) return;
+  // Clear previous content
+  target.innerHTML = '';
 
-  radarChart.innerHTML = '';
-
-  const width = 500;
-  const height = 500;
-  const radius = Math.min(width, height) / 2 - 60;
+  // Base dimensions for the chart
+  const width = 300;
+  const height = 300;
+  const extraMargin = 40; // Extra space for labels
+  const radius = Math.min(width, height) / 2 - 40;
   const centerX = width / 2;
   const centerY = height / 2;
 
-  const svg = d3.select('#radarChart')
+  // Create scalable SVG using viewBox with extra margin
+  const svg = d3.select(target)
     .append('svg')
     .attr('width', '100%')
     .attr('height', '100%')
-    .attr('viewBox', `0 0 ${width} ${height}`)
+    // Expand the viewBox to give extra room for text
+    .attr('viewBox', `-${extraMargin} -${extraMargin} ${width + extraMargin * 2} ${height + extraMargin * 2}`)
     .attr('preserveAspectRatio', 'xMidYMid meet');
 
+  // Create tooltip for interactivity
   const tooltip = d3.select('body').append('div')
     .attr('class', 'radar-tooltip')
     .style('position', 'absolute')
     .style('background', 'rgba(0,0,0,0.7)')
     .style('color', 'white')
-    .style('padding', '8px')
-    .style('border-radius', '4px')
-    .style('font-size', '12px')
+    .style('padding', '6px')
+    .style('border-radius', '3px')
+    .style('font-size', '10px')
     .style('pointer-events', 'none')
     .style('opacity', 0)
     .style('z-index', 1000);
 
+  // Define metrics with provided percentiles
   const metrics = [
     { name: 'Price Competitiveness', value: 100 - parseFloat(pricePercentile) },
     { name: 'Likeability', value: parseFloat(likesPercentile) },
@@ -53,6 +66,7 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
 
   const angleSlice = (Math.PI * 2) / metrics.length;
 
+  // Draw concentric circles and percentage labels
   [0.2, 0.4, 0.6, 0.8, 1].forEach(r => {
     svg.append('circle')
       .attr('cx', centerX)
@@ -60,18 +74,19 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
       .attr('r', radius * r)
       .attr('fill', 'none')
       .attr('stroke', '#ccc')
-      .attr('stroke-width', 1);
+      .attr('stroke-width', 0.5);
 
     svg.append('text')
       .attr('x', centerX)
       .attr('y', centerY - radius * r)
       .attr('text-anchor', 'middle')
       .attr('alignment-baseline', 'middle')
-      .attr('font-size', '10px')
+      .attr('font-size', '8px')
       .attr('fill', '#333')
       .text(`${r * 100}%`);
   });
 
+  // Draw axis lines and labels for each metric
   metrics.forEach((d, i) => {
     const angle = i * angleSlice - Math.PI / 2;
     const lineEnd = {
@@ -79,28 +94,39 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
       y: centerY + radius * Math.sin(angle)
     };
 
+    // Axis line
     svg.append('line')
       .attr('x1', centerX)
       .attr('y1', centerY)
       .attr('x2', lineEnd.x)
       .attr('y2', lineEnd.y)
       .attr('stroke', '#bbb')
-      .attr('stroke-width', 1);
+      .attr('stroke-width', 0.5);
 
-    const labelDistance = radius + 20;
+    // Position labels slightly outside the radar area
+    const labelDistance = radius + 15;
     const labelX = centerX + labelDistance * Math.cos(angle);
     const labelY = centerY + labelDistance * Math.sin(angle);
 
-    const text = svg.append('text')
+    svg.append('text')
       .attr('x', labelX)
       .attr('y', labelY)
-      .attr('text-anchor', 'middle')
-      .attr('alignment-baseline', 'middle')
-      .attr('font-size', '12px')
+      .attr('text-anchor', () => {
+        if (angle === -Math.PI / 2) return 'middle';
+        if (angle < Math.PI / 2 && angle > -Math.PI / 2) return 'start';
+        return 'end';
+      })
+      .attr('alignment-baseline', () => {
+        if (angle === Math.PI / 2 || angle === -Math.PI / 2) return 'middle';
+        if (angle < 0) return 'baseline';
+        return 'hanging';
+      })
+      .attr('font-size', '9px')
       .attr('fill', 'black')
       .text(d.name);
   });
 
+  // Calculate radar points for the data
   const radarPoints = metrics.map((d, i) => {
     const angle = i * angleSlice - Math.PI / 2;
     return {
@@ -111,6 +137,7 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
     };
   });
 
+  // Draw the radar polygon
   const lineGenerator = d3.line()
     .x(d => d.x)
     .y(d => d.y)
@@ -121,13 +148,14 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
     .attr('d', lineGenerator)
     .attr('fill', 'rgba(0, 0, 0, 0.1)')
     .attr('stroke', 'black')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 1.5);
 
-  radarPoints.forEach((d) => {
+  // Add circles at each radar point with tooltip functionality
+  radarPoints.forEach(d => {
     svg.append('circle')
       .attr('cx', d.x)
       .attr('cy', d.y)
-      .attr('r', 6)
+      .attr('r', 4)
       .attr('fill', 'black')
       .on('mouseover', function(event) {
         tooltip.style('opacity', 1)
@@ -140,12 +168,6 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
       });
   });
 
-  svg.append('text')
-    .attr('x', 10)
-    .attr('y', 20)
-    .attr('font-size', '18px')
-    .attr('font-weight', 'bold')
-    .text('Radar Chart');
 };
 
 export default RadarChart;
