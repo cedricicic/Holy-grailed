@@ -20,7 +20,9 @@ const getListingDetails = async (page) => {
         authenticBadge: ".AuthenticationBadge_clickable__HphPo span > span",
         originalPostingDate: ".Metadata_metadata__eYo0L > span:nth-child(2)",
         labelSelector: ".Details_designers__NnQ20 > a",
-        thumbnailContainer: ".Thumbnails_thumbnails__KvRoX.PhotoGallery_thumbnails__VlX1l"
+        thumbnailContainer: ".Thumbnails_thumbnails__KvRoX.PhotoGallery_thumbnails__VlX1l",
+        colour: "p:nth-of-type(4) span.Details_value__S1aVR",
+        size: "p:nth-of-type(3) span.Details_value__S1aVR",
       };
   
       let price = "";
@@ -34,6 +36,8 @@ const getListingDetails = async (page) => {
   
       const cond = getTextContent(selectors.condition);
       const description = getTextContent(selectors.description);
+      const colour = getTextContent(selectors.colour);
+      const size = getTextContent(selectors.size);
       const likesCount = getTextContent(selectors.likesCount);
       const authenticBadge = elementExists(selectors.authenticBadge);
       const originalPostingDate = getTextContent(selectors.originalPostingDate);
@@ -58,6 +62,8 @@ const getListingDetails = async (page) => {
         likesCount,
         isAuthentic: authenticBadge,
         originalPostingDate,
+        colour,
+        size,
       };
     });
   };

@@ -65,8 +65,7 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
   }
 
   return (
-    <div className="value-analysis-container">
-      <h2>Value Analysis</h2>
+    <div>
       
       <div className="metrics-section">
         <div className="metric">
@@ -124,7 +123,7 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
               and waiting might risk losing the opportunity.
             </li>
             <li>
-              A reasonable starting point for negotiation could be around ${calculations.lowballPrice}, 
+              A reasonable starting point for lowballing could be around ${calculations.lowballPrice}, 
               factoring in how far the listing deviates from the average market price.
             </li>
           </ul>

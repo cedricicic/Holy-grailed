@@ -54,19 +54,21 @@
 
 .actions {
   display: flex;
-  padding: 1rem;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: stretch; /* Make buttons stretch to the same width */
+  gap: 0.5rem; /* Add spacing between buttons */
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn,
+.secondary-btn {
+  flex: 1; /* Ensure buttons take equal width */
   padding: 0.6rem;
   border: none;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center; /* Center text inside the button */
 }
-
 
 .primary-btn {
   background: #000000;
@@ -78,8 +80,9 @@
 }
 
 .secondary-btn {
-  background: #ffffff;
+  background: white;
   color: #333;
+  border: 1px solid #505050;
 }
 
 .secondary-btn:hover {
@@ -111,7 +114,7 @@
 
 .carousel-arrow {
   font-size: 2rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: white;
   border: none;
   border-radius: 50%;
   width: 40px;

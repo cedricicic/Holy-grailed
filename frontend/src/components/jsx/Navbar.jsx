@@ -106,7 +106,7 @@ const Navbar = () => {
 
       <div className="navbar-container">
         <div className="navbar-logo">
-          <a href="/"><h1>GRAILED AHEAD</h1></a>
+          <a href="/"><h1>HOLY GRAILED</h1></a>
         </div>
         
         <div className="navbar-search">

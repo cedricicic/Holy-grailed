@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
 const StandardDeviationChart = ({ originalListing, relatedListings }) => {
   const svgRef = useRef();
-  
+  const [mousePosition, setMousePosition] = useState(null);
+
   useEffect(() => {
     if (!originalListing || !relatedListings || relatedListings.length === 0) {
       return;
@@ -25,6 +26,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
     // Calculate statistics
     const mean = d3.mean(prices);
     const stdDev = d3.deviation(prices) || 0;
+    const median = d3.median(prices);
 
     // Create the SVG container
     const svg = d3.select(svgRef.current)
@@ -88,17 +90,92 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
 
     // Add annotation for original price
     svg.append("text")
-      .attr("x", x(originalPrice) + 5)
+      .attr("x", 10)
       .attr("y", 20)
-      .attr("fill", "black")
-      .attr("font-size", "12px")
+      .attr("fill", "red")
+      .attr("font-size", "15px")
       .text("Your Listing");
+
+    // Add median price line
+    svg.append("line")
+      .attr("x1", x(median))
+      .attr("x2", x(median))
+      .attr("y1", 0)
+      .attr("y2", height)
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("stroke-dasharray", "5,5");
+
+    // Add annotation for median price
+    svg.append("text")
+      .attr("x", 10)
+      .attr("y", 40)
+      .attr("fill", "black")
+      .attr("font-size", "15px")
+      .text("Median Price");
+
+    // Add mouse tracking line and tooltip
+    const mouseG = svg.append("g")
+      .attr("class", "mouse-over-effects");
+
+    mouseG.append("path") // This is the black vertical line to follow mouse
+      .attr("class", "mouse-line")
+      .style("stroke", "black")
+      .style("stroke-width", "1px")
+      .style("opacity", "0");
+
+    const mousePerLine = mouseG.append('g')
+      .attr('class', 'mouse-per-line');
+
+    mousePerLine.append('text')
+      .attr('class', 'mouse-text')
+      .attr('transform', 'translate(10,0)');
+
+    mouseG.append('rect') // append a rect to catch mouse movements on canvas
+      .attr('width', width) // can't catch mouse events on a g element
+      .attr('height', height)
+      .attr('fill', 'none')
+      .attr('pointer-events', 'all')
+      .on('mouseout', function() { // on mouse out hide line, circles and text
+        d3.select('.mouse-line')
+          .style('opacity', '0');
+        setMousePosition(null);
+      })
+      .on('mouseover', function() { // on mouse in show line, circles and text
+        d3.select('.mouse-line')
+          .style('opacity', '1');
+      })
+      .on('mousemove', function(event) { // mouse moving over canvas
+        const mouse = d3.pointer(event);
+        const mouseX = mouse[0];
+        const priceAtMouse = x.invert(mouseX);
+        const stdDevAtMouse = (priceAtMouse - mean) / stdDev;
+
+        setMousePosition({ price: priceAtMouse, stdDev: stdDevAtMouse });
+
+        d3.select('.mouse-line')
+          .attr('d', function() {
+            let d = 'M' + mouseX + ',' + height;
+            d += ' ' + mouseX + ',' + 0;
+            return d;
+          });
+
+        // d3.select('.mouse-text')
+        //   .text(`Price: $${priceAtMouse.toFixed(2)}, Std Dev: ${stdDevAtMouse.toFixed(2)}`)
+        //   .attr('transform', `translate(${mouseX + 10},${20})`);
+      });
+
   }, [originalListing, relatedListings]);
 
   return (
     <div className="chart-container">
       <h3>Price Distribution (Normal Curve)</h3>
       <svg ref={svgRef}></svg>
+      {mousePosition && (
+        <div style={{ marginTop: '10px' }}>
+          <strong>Price:</strong> ${mousePosition.price.toFixed(2)}, <strong>Std Dev:</strong> {mousePosition.stdDev.toFixed(2)}
+        </div>
+      )}
     </div>
   );
 };

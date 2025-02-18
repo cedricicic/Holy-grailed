@@ -78,6 +78,57 @@ const NetworkChart = ({ data }) => {
       .alphaDecay(0.01)
       .alpha(1).restart();
 
+      svg.append('text')
+    .attr('x', 10)
+    .attr('y', 30)
+    .attr('font-size', '30px')
+    .attr('font-weight', 'bold')
+    .text('Network Chart');
+
+  // Add top five tags legend
+  const topFiveTags = nodesArray
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  const legendPadding = 30;
+  const legend = svg.append('g')
+    .attr('class', 'legend')
+    .attr('transform', `translate(${legendPadding}, ${height - legendPadding})`);
+
+  // Add legend background
+  legend.append('rect')
+    .attr('width', 180)
+    .attr('height', topFiveTags.length * 20 + 25)
+    .attr('y', -topFiveTags.length * 20 - 10)
+    .attr('rx', 5)
+    .attr('ry', 5)
+    .attr('fill', 'white')
+    .attr('opacity', 1)
+    .attr('stroke', 'black');
+
+  // Add legend title
+  legend.append('text')
+    .attr('x', 5)
+    .attr('y', -topFiveTags.length * 20 + 5)
+    .text('Top 5 Designers:')
+    .attr('font-weight', 'bold')
+    .attr('font-size', '14px');
+
+  // Add legend items
+  legend.selectAll('.legend-item')
+  .data(topFiveTags)
+  .enter()
+  .append('text')
+  .attr('class', 'legend-item')
+  .attr('x', 10)
+  .attr('y', (d, i) => -topFiveTags.length * 20 + 25 + i * 20)
+  .text(d => {
+    const percentage = ((d.count / data.length) * 100).toFixed(1); // Calculate percentage
+    return `${d.id} (${percentage}%)`; // Display percentage
+  })
+  .attr('font-size', '12px')
+  .attr('fill', '#333');
+
     const link = svg.append('g')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)

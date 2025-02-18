@@ -1,9 +1,7 @@
 .value-analysis-container {
     background-color: #f8f9fa;
-    border-radius: 8px;
     padding: 24px;
     margin: 20px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
   
   .metrics-section {
@@ -16,8 +14,7 @@
   .metric {
     background-color: white;
     padding: 16px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #505050;
   }
   
   .metric h3 {
@@ -35,8 +32,6 @@
   .recommendations-section {
     background-color: white;
     padding: 20px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
   
   .recommendation-group {
@@ -47,7 +42,6 @@
     color: #444;
     font-size: 18px;
     margin-bottom: 12px;
-    border-bottom: 1px solid #eee;
     padding-bottom: 8px;
   }
   

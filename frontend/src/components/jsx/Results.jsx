@@ -78,6 +78,17 @@ const ResultsPage = () => {
     return <div className="insufficient-data">Insufficient data to render the analysis.</div>;
   }
 
+  const [buttonText, setButtonText] = useState('COPY LISTING');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(originalListing.link)
+      .then(() => {
+        setButtonText('Copied!');
+        setTimeout(() => setButtonText('COPY LISTING'), 2000);
+      })
+      .catch(err => console.error('Failed to copy: ', err));
+  };
+
   return (
     <div className="results-page">
       <div className="results-container">
@@ -85,54 +96,64 @@ const ResultsPage = () => {
           <div className="listing-card">
             <div className="listing-details">
               <p className="price">{originalListing.labels}</p>
-              <p>{originalListing.description || 'N/A'}</p>
-              <p><span>Condition:</span> {originalListing.cond || 'N/A'}</p>
-              <p><span>Last update:</span> {originalListing.originalPostingDate || 'N/A'}</p>
+              <p>{originalListing.description || "N/A"}</p>
+              <p>
+                <span>Colour:</span> {originalListing.colour || "N/A"}
+              </p>
+              <p>
+                <span>Condition:</span> {originalListing.cond || "N/A"}
+              </p>
+              <p>
+                <span>Last update:</span>{" "}
+                {originalListing.originalPostingDate || "N/A"}
+              </p>
+              <br></br>
+              <p className="price">{originalListing.price}</p>
             </div>
-            <div className="actions">
-              <button className="primary-btn">View Listing</button>
-              <br>
-              </br>
-              <button className="secondary-btn">Placeholder</button>
-              <br>
-              </br>
-              <button className="secondary-btn">Download compared listings</button>
+            <div class="actions">
+              <button class="primary-btn">VIEW LISTING</button>
+              <button className="secondary-btn" onClick={handleCopy}>
+      {buttonText}
+    </button>
+              <button class="secondary-btn">DOWNLOAD LISTINGS</button>
             </div>
           </div>
         </div>
 
         <div className="charts-container">
           <div className="chart-card-carousel">
-            <button 
-              className="carousel-arrow left-arrow" 
-              onClick={() => navigateCard('prev')}
+            <button
+              className="carousel-arrow left-arrow"
+              onClick={() => navigateCard("prev")}
             >
               &#8249;
             </button>
-            
+
             <div className="chart-card">
               {chartComponents[activeCardIndex]}
               <div className="carousel-indicators">
                 {chartComponents.map((_, index) => (
-                  <span 
-                    key={index} 
-                    className={`indicator ${index === activeCardIndex ? 'active' : ''}`}
+                  <span
+                    key={index}
+                    className={`indicator ${
+                      index === activeCardIndex ? "active" : ""
+                    }`}
                     onClick={() => setActiveCardIndex(index)}
                   />
                 ))}
               </div>
             </div>
-            
-            <button 
-              className="carousel-arrow right-arrow" 
-              onClick={() => navigateCard('next')}
+
+            <button
+              className="carousel-arrow right-arrow"
+              onClick={() => navigateCard("next")}
             >
               &#8250;
             </button>
           </div>
-          
+
           <div className="value-analysis-container">
-            <h3>Value Analysis</h3>
+            <h2>Value Analysis</h2>
             <ValueAnalysis
               originalListing={originalListing}
               relatedListings={relatedListings}
