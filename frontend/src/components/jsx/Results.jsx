@@ -4,6 +4,7 @@ import RadarChart from './charts/radar.jsx';
 import NetworkChart from './charts/network.jsx';
 import PriceHistogram from './charts/price-histogram.jsx';
 import ValueAnalysis from './charts/value-analysis.jsx';
+import BubbleChart from './charts/bubble.jsx';
 import '../css/resultspage.css';
 
 const ResultsPage = () => {
@@ -52,7 +53,11 @@ const ResultsPage = () => {
     <PriceHistogram
       originalListing={originalListing}
       relatedListings={relatedListings}
-    />
+    />,
+    <BubbleChart
+    originalListing={originalListing}
+    relatedListings={relatedListings}
+  />
   ];
 
   const navigateCard = (direction) => {
