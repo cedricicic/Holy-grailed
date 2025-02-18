@@ -5,6 +5,7 @@ import Hero from "./components/jsx/Hero.jsx";
 import Navbar from "./components/jsx/navbar.jsx";
 import Results from "./components/jsx/Results.jsx";
 import RecentSearches from "./components/jsx/RecentSearches.jsx";
+import Feedback from './components/jsx/Feedback.jsx';
 
 function Home() {
   return (
@@ -25,10 +26,20 @@ function ResultsPage() {
   );
 }
 
+
 function Reporter() {
   return (
     <>
       <Report />
+    </>
+  );
+}
+
+function FeedbackPage() {
+  return (
+    <>
+      <Navbar />
+      <Feedback />
     </>
   );
 }
@@ -39,6 +50,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/resultspage" element={<ResultsPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>
     </>
   );

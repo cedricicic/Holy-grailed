@@ -220,3 +220,41 @@
   background: white;
   padding: 2rem;
 }
+
+.seller-section {
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #000;
+  font-size: 14px;
+}
+
+.seller-section p {
+  margin: 0;
+  color: #000;
+}
+
+.seller-section a {
+  color: #000;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.follow-btn {
+  background-color: #000;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.follow-btn:hover {
+  background-color: #333;
+}

@@ -136,12 +136,12 @@ const Navbar = () => {
       
       <div className="navbar-categories">
         <ul>
-          <li><a href="https://cedricleung.ca/#/contact">FEEDBACK</a></li>
+          <li><a href="#/feedback">FEEDBACK</a></li>
           <li className="dropdown">
             <a href="https://cedricleung.ca/">ALL PROJECTS</a>
           </li>
           <li className="dropdown">
-            <a href="/">MY PICKS</a>
+            <a href="https://www.grailed.com/Meheeheehaw/favorites">MY PICKS</a>
           </li>
         </ul>
       </div>

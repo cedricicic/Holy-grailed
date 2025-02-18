@@ -4,7 +4,6 @@ import RadarChart from './charts/radar.jsx';
 import NetworkChart from './charts/network.jsx';
 import PriceHistogram from './charts/price-histogram.jsx';
 import ValueAnalysis from './charts/value-analysis.jsx';
-import BubbleChartD3 from './charts/bubble-d3.jsx';
 import '../css/resultspage.css';
 
 const ResultsPage = () => {
@@ -51,10 +50,6 @@ const ResultsPage = () => {
     />,
     <NetworkChart data={networkData} />,
     <PriceHistogram
-      originalListing={originalListing}
-      relatedListings={relatedListings}
-    />,
-    <BubbleChartD3
       originalListing={originalListing}
       relatedListings={relatedListings}
     />
@@ -174,6 +169,19 @@ const ResultsPage = () => {
               <button className="secondary-btn" onClick={handleDownload}>
                 {downloadButtonText}
               </button>
+            </div>
+            <br></br>
+
+            <div className="seller-section">
+              <p><strong>Cedric Leung</strong></p>
+              <p>Submit your feedback · <a href="#/feedback">Here</a></p>
+              <p>Also, I'm curretly looking for summer 2025 internships :)</p>
+              <button
+  className="follow-btn"
+  onClick={() => window.open('https://www.linkedin.com/in/cedric-leung-38637029a/', '_blank')}
+>
+  FOLLOW
+</button>
             </div>
           </div>
         </div>
