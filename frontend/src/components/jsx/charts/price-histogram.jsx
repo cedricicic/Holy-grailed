@@ -10,28 +10,28 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       return;
     }
 
-    // Clean up previous SVG content
+
     d3.select(svgRef.current).selectAll('*').remove();
 
-    // Define overall dimensions and margins
+
     const outerWidth = 500;
     const outerHeight = 400;
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
     const width = outerWidth - margin.left - margin.right;
     const height = outerHeight - margin.top - margin.bottom;
 
-    // Parse prices
+
     const prices = relatedListings.map(item =>
       parseFloat(item.price.replace('$', '').replace(',', ''))
     );
     const originalPrice = parseFloat(originalListing.price.replace('$', '').replace(',', ''));
 
-    // Calculate statistics
+
     const mean = d3.mean(prices);
     const stdDev = d3.deviation(prices) || 0;
     const median = d3.median(prices);
 
-    // Create the SVG container with viewBox for scaling
+
     const svg = d3.select(svgRef.current)
       .attr('width', '100%')
       .attr('height', '100%')
@@ -40,29 +40,27 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // X scale
+
     const x = d3.scaleLinear()
       .domain([mean - 3 * stdDev, mean + 3 * stdDev])
       .range([0, width]);
 
-    // Y scale (arbitrary for normal distribution shape)
     const y = d3.scaleLinear()
       .domain([0, 1])
       .range([height, 0]);
 
-    // Generate normal distribution curve data
+
     const normalDist = d3.range(mean - 3 * stdDev, mean + 3 * stdDev, stdDev / 20).map(xValue => ({
       x: xValue,
       y: (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((xValue - mean) / stdDev) ** 2)
     }));
 
-    // Line generator for the curve
+
     const line = d3.line()
       .x(d => x(d.x))
-      .y(d => y(d.y / d3.max(normalDist, d => d.y))) // normalize the y values
+      .y(d => y(d.y / d3.max(normalDist, d => d.y))) 
       .curve(d3.curveBasis);
 
-    // Draw normal distribution curve
     svg.append("path")
       .datum(normalDist)
       .attr("fill", "none")
@@ -70,7 +68,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("stroke-width", 2)
       .attr("d", line);
 
-    // Add X axis
+
     svg.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x).tickFormat(d3.format(".2f")))
@@ -81,7 +79,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("text-anchor", "middle")
       .text("Price ($)");
 
-    // Add original listing price line
+
     svg.append("line")
       .attr("x1", x(originalPrice))
       .attr("x2", x(originalPrice))
@@ -91,7 +89,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("stroke-width", 2)
       .attr("stroke-dasharray", "5,5");
 
-    // Add annotation for original price
+
     svg.append("text")
       .attr("x", 10)
       .attr("y", 20)
@@ -99,7 +97,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("font-size", "15px")
       .text("Your Listing");
 
-    // Add median price line
+
     svg.append("line")
       .attr("x1", x(median))
       .attr("x2", x(median))
@@ -109,7 +107,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("stroke-width", 2)
       .attr("stroke-dasharray", "5,5");
 
-    // Add annotation for median price
+
     svg.append("text")
       .attr("x", 10)
       .attr("y", 40)
@@ -117,17 +115,17 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
       .attr("font-size", "15px")
       .text("Median Price");
 
-    // Add mouse tracking line and tooltip effects
+
     const mouseG = svg.append("g")
       .attr("class", "mouse-over-effects");
 
-    mouseG.append("path") // vertical line to follow mouse
+    mouseG.append("path") 
       .attr("class", "mouse-line")
       .style("stroke", "black")
       .style("stroke-width", "1px")
       .style("opacity", "0");
 
-    mouseG.append('rect') // rectangle to capture mouse movements
+    mouseG.append('rect') 
       .attr('width', width)
       .attr('height', height)
       .attr('fill', 'none')

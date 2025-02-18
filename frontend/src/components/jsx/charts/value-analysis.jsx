@@ -7,7 +7,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       return null;
     }
 
-    // Parse original listing data
     const originalPrice = parseFloat(
       originalListing.price.replace(/[$,]/g, "")
     );
@@ -16,7 +15,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       originalLikes > 0 ? originalPrice / originalLikes : 0;
     const listingAge = originalListing.daysListed || 0;
 
-    // Calculate average price per like across all related listings
     const pricesPerLike = relatedListings
       .map((listing) => {
         const price = parseFloat(listing.price.replace(/[$,]/g, ""));
@@ -31,7 +29,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
           pricesPerLike.length
         : 0;
 
-    // Calculate average price for related listings
     const marketPrices = relatedListings.map((listing) =>
       parseFloat(listing.price.replace(/[$,]/g, ""))
     );
@@ -39,7 +36,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       marketPrices.reduce((sum, price) => sum + price, 0) /
       relatedListings.length;
 
-    // Calculate standard deviation for market prices
     const priceVariance =
       marketPrices.reduce(
         (sum, price) => sum + Math.pow(price - avgMarketPrice, 2),
@@ -47,18 +43,15 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       ) / marketPrices.length;
     const priceStdDev = Math.sqrt(priceVariance);
 
-    // Calculate percentile of current price in the market
     const sortedPrices = [...marketPrices].sort((a, b) => a - b);
     const pricePercentile =
       (sortedPrices.findIndex((price) => price >= originalPrice) /
         sortedPrices.length) *
       100;
 
-    // Calculate price deviation as a percentage
     const priceDeviation =
       ((originalPrice - avgMarketPrice) / avgMarketPrice) * 100;
 
-    // Determine market demand factors
     const avgLikes =
       relatedListings.reduce(
         (sum, listing) => sum + parseInt(listing.likesCount || 0, 10),
@@ -66,10 +59,8 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       ) / relatedListings.length;
     const demandRatio = originalLikes / avgLikes;
 
-    // Calculate optimal price point based on market data
     const optimalPrice = avgMarketPrice * (1 + (demandRatio - 1) * 0.2);
 
-    // Suggested price adjustment factors
     const marketAlignmentFactor =
       priceDeviation > 15
         ? 0.15
@@ -79,13 +70,11 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
     const ageFactor = listingAge > 30 ? 0.1 : listingAge > 14 ? 0.05 : 0;
     const demandFactor = demandRatio < 0.7 ? 0.1 : demandRatio < 0.9 ? 0.05 : 0;
 
-    // Combined adjustment percentage
     const adjustmentPercentage =
       (marketAlignmentFactor + ageFactor + demandFactor) * 100;
     const suggestedReduction =
       originalPrice * (marketAlignmentFactor + ageFactor + demandFactor);
 
-    // Suggested lowball price using dynamic factors
     const marketVolatility = priceStdDev / avgMarketPrice;
     const lowballFactor =
       0.15 + marketVolatility * 0.5 + (listingAge > 21 ? 0.1 : 0);
@@ -112,11 +101,9 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
     return <p>Insufficient data for value analysis.</p>;
   }
 
-  // Decision tree functions for generating dynamic recommendations
   const getSellerRecommendations = () => {
     const recommendations = [];
 
-    // Price adjustment recommendations
     if (parseFloat(calculations.priceDeviation) > 20) {
       recommendations.push({
         priority: "high",
@@ -137,7 +124,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       });
     }
 
-    // Listing age-based recommendations
     if (calculations.listingAge > 30) {
       recommendations.push({
         priority: "high",
@@ -159,7 +145,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       });
     }
 
-    // Demand-based recommendations
     if (parseFloat(calculations.demandRatio) > 1.5) {
       recommendations.push({
         priority: "low",
@@ -184,7 +169,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
   const getBuyerRecommendations = () => {
     const recommendations = [];
 
-    // Value assessment recommendations
     if (parseFloat(calculations.priceDeviation) > 25) {
       recommendations.push({
         priority: "high",
@@ -211,7 +195,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       });
     }
 
-    // Listing age leverage
     if (
       calculations.listingAge > 21 &&
       parseFloat(calculations.priceDeviation) > 0
@@ -225,7 +208,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       });
     }
 
-    // Market volatility insights
     if (parseFloat(calculations.marketVolatility) > 25) {
       recommendations.push({
         priority: "medium",
@@ -243,7 +225,6 @@ const ValueAnalysis = ({ originalListing, relatedListings }) => {
       });
     }
 
-    // Popularity-based insights
     if (parseFloat(calculations.demandRatio) > 1.3) {
       recommendations.push({
         priority: "high",

@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import RadarChart from './charts/radar.jsx';
-import NetworkChart from './charts/network.jsx';
-import PriceHistogram from './charts/price-histogram.jsx';
-import ValueAnalysis from './charts/value-analysis.jsx';
-import BubbleChart from './charts/bubble.jsx';
-import '../css/resultspage.css';
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import RadarChart from "./charts/radar.jsx";
+import NetworkChart from "./charts/network.jsx";
+import PriceHistogram from "./charts/price-histogram.jsx";
+import ValueAnalysis from "./charts/value-analysis.jsx";
+import BubbleChart from "./charts/bubble.jsx";
+import "../css/resultspage.css";
 
 const ResultsPage = () => {
   const location = useLocation();
   const scrapeResult = location.state?.scrapeResult;
   const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const [buttonText, setButtonText] = useState('COPY LISTING');
-  const [downloadButtonText, setDownloadButtonText] = useState('DOWNLOAD LISTINGS');
+  const [buttonText, setButtonText] = useState("COPY LISTING");
+  const [downloadButtonText, setDownloadButtonText] =
+    useState("DOWNLOAD LISTINGS");
 
   const calculatePercentile = (value, array) => {
     const sorted = [...array].sort((a, b) => a - b);
-    return ((sorted.filter(v => v < value).length / sorted.length) * 100).toFixed(1);
+    return (
+      (sorted.filter((v) => v < value).length / sorted.length) *
+      100
+    ).toFixed(1);
   };
 
   const originalListing = scrapeResult?.originalListingDetails;
@@ -25,21 +29,25 @@ const ResultsPage = () => {
   let pricePercentile, likesPercentile, photosPercentile;
 
   if (originalListing && relatedListings) {
-    const targetPrice = parseFloat(originalListing.price.replace('$', ''));
-    const marketPrices = relatedListings.map(item => parseFloat(item.price.replace('$', '')));
-    
+    const targetPrice = parseFloat(originalListing.price.replace("$", ""));
+    const marketPrices = relatedListings.map((item) =>
+      parseFloat(item.price.replace("$", ""))
+    );
+
     const targetLikes = parseInt(originalListing.likesCount || 0, 10);
-    const marketLikes = relatedListings.map(item => parseInt(item.likesCount || 0, 10));
+    const marketLikes = relatedListings.map((item) =>
+      parseInt(item.likesCount || 0, 10)
+    );
 
     const targetPhotos = originalListing.imageCount;
-    const marketPhotos = relatedListings.map(item => item.imageCount);
+    const marketPhotos = relatedListings.map((item) => item.imageCount);
 
     pricePercentile = calculatePercentile(targetPrice, marketPrices);
     likesPercentile = calculatePercentile(targetLikes, marketLikes);
     photosPercentile = calculatePercentile(targetPhotos, marketPhotos);
   }
 
-  const networkData = relatedListings?.map(item => ({
+  const networkData = relatedListings?.map((item) => ({
     labels: item.labels,
   }));
 
@@ -55,81 +63,76 @@ const ResultsPage = () => {
       relatedListings={relatedListings}
     />,
     <BubbleChart
-    originalListing={originalListing}
-    relatedListings={relatedListings}
-  />
+      originalListing={originalListing}
+      relatedListings={relatedListings}
+    />,
   ];
 
   const navigateCard = (direction) => {
-    if (direction === 'next') {
-      setActiveCardIndex((prevIndex) => 
+    if (direction === "next") {
+      setActiveCardIndex((prevIndex) =>
         prevIndex === chartComponents.length - 1 ? 0 : prevIndex + 1
       );
     } else {
-      setActiveCardIndex((prevIndex) => 
+      setActiveCardIndex((prevIndex) =>
         prevIndex === 0 ? chartComponents.length - 1 : prevIndex - 1
       );
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(originalListing.link)
+    navigator.clipboard
+      .writeText(originalListing.link)
       .then(() => {
-        setButtonText('Copied!');
-        setTimeout(() => setButtonText('COPY LISTING'), 2000);
+        setButtonText("Copied!");
+        setTimeout(() => setButtonText("COPY LISTING"), 2000);
       })
-      .catch(err => console.error('Failed to copy: ', err));
+      .catch((err) => console.error("Failed to copy: ", err));
   };
 
-  // Convert JSON to CSV
   const convertToCSV = (objectArray) => {
-    if (!objectArray || objectArray.length === 0) return '';
-    
-    // Get headers from first object
+    if (!objectArray || objectArray.length === 0) return "";
+
     const headers = Object.keys(objectArray[0]);
-    
-    // Create CSV rows with headers
+
     const csvRows = [
-      headers.join(','), // Header row
-      ...objectArray.map(row => 
-        headers.map(fieldName => {
-          // Handle fields that might contain commas by wrapping in quotes
-          const value = row[fieldName] ? String(row[fieldName]) : '';
-          return `"${value.replace(/"/g, '""')}"`;
-        }).join(',')
-      )
+      headers.join(","),
+      ...objectArray.map((row) =>
+        headers
+          .map((fieldName) => {
+            const value = row[fieldName] ? String(row[fieldName]) : "";
+            return `"${value.replace(/"/g, '""')}"`;
+          })
+          .join(",")
+      ),
     ];
-    
-    return csvRows.join('\n');
+
+    return csvRows.join("\n");
   };
 
-  // Handle download of listings as CSV
   const handleDownload = () => {
     if (!relatedListings || relatedListings.length === 0) {
-      console.error('No listings to download');
+      console.error("No listings to download");
       return;
     }
 
-    // Prepare data - combine original listing with related listings
     const allListings = [originalListing, ...relatedListings];
-    
+
     const csvContent = convertToCSV(allListings);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'listings.csv');
-    
-    // Temporarily show feedback to user
-    setDownloadButtonText('Downloading...');
-    
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", "listings.csv");
+
+    setDownloadButtonText("Downloading...");
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    // Reset button text after download
-    setTimeout(() => setDownloadButtonText('DOWNLOAD LISTINGS'), 2000);
+
+    setTimeout(() => setDownloadButtonText("DOWNLOAD LISTINGS"), 2000);
   };
 
   if (!scrapeResult) {
@@ -137,7 +140,11 @@ const ResultsPage = () => {
   }
 
   if (!originalListing || !relatedListings) {
-    return <div className="insufficient-data">Insufficient data to render the analysis.</div>;
+    return (
+      <div className="insufficient-data">
+        Insufficient data to render the analysis.
+      </div>
+    );
   }
 
   return (
@@ -178,19 +185,34 @@ const ResultsPage = () => {
             <br></br>
 
             <div className="seller-section">
-              <p><strong>Cedric Leung</strong></p>
-              <p>Submit your feedback · <a href="#/feedback">Here</a></p>
+              <p>
+                <strong>Cedric Leung</strong>
+              </p>
+              <p>
+                Submit your feedback · <a href="#/feedback">Here</a>
+              </p>
               <p>Also, I'm curretly looking for summer 2025 internships :)</p>
               <button
-  className="follow-btn"
-  onClick={() => window.open('https://www.linkedin.com/in/cedric-leung-38637029a/', '_blank')}
->
-  FOLLOW
-</button>
+                className="follow-btn"
+                onClick={() =>
+                  window.open(
+                    "https://www.linkedin.com/in/cedric-leung-38637029a/",
+                    "_blank"
+                  )
+                }
+              >
+                FOLLOW
+              </button>
             </div>
           </div>
-          <p className='note'> Note that we are comparing your listing with the top 30 TRENDING related listings.</p>
-          <p className='note2'>Please click on "DOWNLOAD LISTINGS" to see them in details.</p>
+          <p className="note">
+            {" "}
+            Note that we are comparing your listing with the top 30 TRENDING
+            related listings.
+          </p>
+          <p className="note2">
+            Please click on "DOWNLOAD LISTINGS" to see them in details.
+          </p>
         </div>
 
         <div className="charts-container">

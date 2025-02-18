@@ -7,7 +7,6 @@ const NetworkChart = ({ data }) => {
   useEffect(() => {
     if (!data || !networkGraphRef.current) return;
 
-    // Clear previous content
     networkGraphRef.current.innerHTML = '';
 
     let nodes = {};
@@ -57,7 +56,6 @@ const NetworkChart = ({ data }) => {
       .attr('viewBox', `0 0 ${width} ${height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet');
 
-    // Calculate node radii based on total number of nodes and counts
     const nodeCount = nodesArray.length;
     const baseMaxRadius = Math.min(width, height) / 15;
     const maxRadius = nodeCount > 50 ? baseMaxRadius / Math.log(nodeCount) : baseMaxRadius;
@@ -76,7 +74,6 @@ const NetworkChart = ({ data }) => {
       .alpha(1).restart();
 
   
-    // Add top five tags legend
     const topFiveTags = nodesArray
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
@@ -86,7 +83,6 @@ const NetworkChart = ({ data }) => {
       .attr('class', 'legend')
       .attr('transform', `translate(${legendPadding}, ${height - legendPadding})`);
 
-    // Legend background
     legend.append('rect')
       .attr('width', 180)
       .attr('height', topFiveTags.length * 20 + 25)
@@ -97,7 +93,6 @@ const NetworkChart = ({ data }) => {
       .attr('opacity', 1)
       .attr('stroke', 'black');
 
-    // Legend title
     legend.append('text')
       .attr('x', 5)
       .attr('y', -topFiveTags.length * 20 + 5)
@@ -105,7 +100,6 @@ const NetworkChart = ({ data }) => {
       .attr('font-weight', 'bold')
       .attr('font-size', '14px');
 
-    // Legend items
     legend.selectAll('.legend-item')
       .data(topFiveTags)
       .enter()
@@ -177,7 +171,6 @@ const NetworkChart = ({ data }) => {
         .style('left', `${event.pageX + 10}px`)
         .style('top', `${event.pageY - 28}px`);
 
-      // Highlight connected links
       link.style('stroke-opacity', l =>
         l.source.id === d.id || l.target.id === d.id ? 0.9 : 0.2
       );
