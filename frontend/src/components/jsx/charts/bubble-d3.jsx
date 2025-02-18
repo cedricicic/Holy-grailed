@@ -17,56 +17,58 @@ const BubbleChartD3 = ({ originalListing, relatedListings }) => {
     const likes = relatedListings.map((item) => likesToNumber(item.likesCount));
     const maxLikes = Math.max(...likes);
 
-    const width = chartRef.current.clientWidth;
-    const height = chartRef.current.clientHeight;
+    const container = chartRef.current;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
-    const xScale = d3.scaleLinear().domain([minPrice, maxPrice]).range([50, width - 50]);
-    const sizeScale = d3.scaleSqrt().domain([0, maxLikes]).range([20, 100]);
+    const sizeScale = d3.scaleSqrt().domain([0, maxLikes]).range([10, 50]);
 
-    const svg = d3.select(chartRef.current).selectAll('*').remove();
+    d3.select(container).select('svg').remove();
 
-    const chartSvg = d3.select(chartRef.current)
+    const svg = d3.select(container)
       .append('svg')
       .attr('width', width)
       .attr('height', height);
 
-    // Draw bubbles
-    chartSvg.selectAll('circle')
-      .data(relatedListings)
-      .enter()
-      .append('circle')
-      .attr('cx', (d) => xScale(priceToNumber(d.price)))
-      .attr('cy', height / 2)
-      .attr('r', (d) => sizeScale(likesToNumber(d.likesCount)))
-      .attr('fill', '#3B82F6')
-      .attr('opacity', 0.7)
-      .on('mouseover', function () {
-        d3.select(this).transition().duration(200).attr('opacity', 1).attr('r', (d) => sizeScale(likesToNumber(d.likesCount)) * 1.2);
-      })
-      .on('mouseout', function () {
-        d3.select(this).transition().duration(200).attr('opacity', 0.7).attr('r', (d) => sizeScale(likesToNumber(d.likesCount)));
-      });
+    const nodes = relatedListings.map((d) => ({
+      ...d,
+      radius: sizeScale(likesToNumber(d.likesCount)),
+    }));
 
-    // Draw original listing
     if (originalListing) {
-      chartSvg.append('circle')
-        .attr('cx', xScale(priceToNumber(originalListing.price)))
-        .attr('cy', height / 2)
-        .attr('r', sizeScale(likesToNumber(originalListing.likesCount)))
-        .attr('fill', '#10B981')
-        .attr('opacity', 0.9)
-        .on('mouseover', function () {
-          d3.select(this).transition().duration(200).attr('opacity', 1).attr('r', sizeScale(likesToNumber(originalListing.likesCount)) * 1.2);
-        })
-        .on('mouseout', function () {
-          d3.select(this).transition().duration(200).attr('opacity', 0.9).attr('r', sizeScale(likesToNumber(originalListing.likesCount)));
-        });
+      nodes.push({
+        ...originalListing,
+        isOriginal: true,
+        radius: sizeScale(likesToNumber(originalListing.likesCount)),
+      });
+    }
+
+    const simulation = d3.forceSimulation(nodes)
+      .force('x', d3.forceX(width / 2).strength(0.05))
+      .force('y', d3.forceY(height / 2).strength(0.05))
+      .force('collide', d3.forceCollide((d) => d.radius + 2))
+      .on('tick', ticked);
+
+    function ticked() {
+      const bubbles = svg.selectAll('circle')
+        .data(nodes, (d) => d.id || d.title);
+
+      bubbles.enter()
+        .append('circle')
+        .attr('r', (d) => d.radius)
+        .attr('fill', (d) => (d.isOriginal ? '#10B981' : '#3B82F6'))
+        .attr('opacity', 0.8)
+        .merge(bubbles)
+        .attr('cx', (d) => d.x)
+        .attr('cy', (d) => d.y);
+
+      bubbles.exit().remove();
     }
   }, [originalListing, relatedListings]);
 
   return (
-    <div className="w-full h-screen bg-black p-8 text-white relative" ref={chartRef}>
-      <h2 className="text-2xl font-bold text-center mb-4">Market Position</h2>
+    <div className="w-full h-screen bg-black text-white relative overflow-hidden" ref={chartRef}>
+      <h2 className="text-2xl font-bold text-center mb-4 absolute top-0 left-0 w-full">Market Position</h2>
     </div>
   );
 };

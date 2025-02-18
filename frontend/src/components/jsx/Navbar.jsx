@@ -71,9 +71,9 @@ const Navbar = () => {
         }
         
         .alert-error {
-          background-color: #FEECEC;
-          border-left: 4px solid #F44336;
-          color: #D32F2F;
+          background-color:rgb(255, 255, 255);
+          border-left: 4px solidrgb(0, 0, 0);
+          color:rgb(0, 0, 0);
         }
         
         .alert-icon {

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import RadarChart from './charts/radar.jsx'; 
+import RadarChart from './charts/radar.jsx';
 import NetworkChart from './charts/network.jsx';
 import PriceHistogram from './charts/price-histogram.jsx';
 import ValueAnalysis from './charts/value-analysis.jsx';
@@ -10,6 +10,7 @@ import '../css/resultspage.css';
 const ResultsPage = () => {
   const location = useLocation();
   const scrapeResult = location.state?.scrapeResult;
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const calculatePercentile = (value, array) => {
     const sorted = [...array].sort((a, b) => a - b);
@@ -40,85 +41,105 @@ const ResultsPage = () => {
     labels: item.labels,
   }));
 
+  const chartComponents = [
+    <RadarChart
+      pricePercentile={pricePercentile}
+      likesPercentile={likesPercentile}
+      photosPercentile={photosPercentile}
+    />,
+    <NetworkChart data={networkData} />,
+    <PriceHistogram
+      originalListing={originalListing}
+      relatedListings={relatedListings}
+    />,
+    <BubbleChartD3
+      originalListing={originalListing}
+      relatedListings={relatedListings}
+    />
+  ];
+
+  const navigateCard = (direction) => {
+    if (direction === 'next') {
+      setActiveCardIndex((prevIndex) => 
+        prevIndex === chartComponents.length - 1 ? 0 : prevIndex + 1
+      );
+    } else {
+      setActiveCardIndex((prevIndex) => 
+        prevIndex === 0 ? chartComponents.length - 1 : prevIndex - 1
+      );
+    }
+  };
+
+  if (!scrapeResult) {
+    return <div className="no-results">No results found.</div>;
+  }
+
+  if (!originalListing || !relatedListings) {
+    return <div className="insufficient-data">Insufficient data to render the analysis.</div>;
+  }
+
   return (
     <div className="results-page">
-      {scrapeResult ? (
-        <>
-          {originalListing && relatedListings ? (
-            <>
-              {/* -- Header / Main Listing Info -- */}
-              <div className="listing-card">
-                <div className="listing-images">
-                  {originalListing.images && originalListing.images.length > 0 ? (
-                    originalListing.images.map((img, index) => (
-                      <img key={index} src={img} alt={`Listing ${index}`} />
-                    ))
-                  ) : (
-                    <div className="no-image">No Image</div>
-                  )}
-                </div>
-                <div className="listing-info">
-                  <h2>{originalListing.title}</h2>
-                  <p>{originalListing.price}</p>
-                  <p>Condition: {originalListing.condition || 'N/A'}</p>
-                  <p>Size: {originalListing.size || 'N/A'}</p>
-                  <p>Color: {originalListing.color || 'N/A'}</p>
-                  <div className="actions">
-                    <button>Purchase</button>
-                    <button>Offer</button>
-                    <button>Message</button>
-                  </div>
-                </div>
-              </div>
+      <div className="results-container">
+        <div className="listing-info-panel">
+          <div className="listing-card">
+            <div className="listing-details">
+              <p className="price">{originalListing.labels}</p>
+              <p>{originalListing.description || 'N/A'}</p>
+              <p><span>Condition:</span> {originalListing.cond || 'N/A'}</p>
+              <p><span>Last update:</span> {originalListing.originalPostingDate || 'N/A'}</p>
+            </div>
+            <div className="actions">
+              <button className="primary-btn">View Listing</button>
+              <br>
+              </br>
+              <button className="secondary-btn">Placeholder</button>
+              <br>
+              </br>
+              <button className="secondary-btn">Download compared listings</button>
+            </div>
+          </div>
+        </div>
 
-              {/* -- Charts Section -- */}
-              <div className="charts-section">
-                <div className="chart-container">
-                <RadarChart
-                  pricePercentile={pricePercentile}
-                  likesPercentile={likesPercentile}
-                  photosPercentile={photosPercentile}
-                />
-                </div>
-                <div className="chart-container">
-                  <NetworkChart data={networkData} />
-                </div>
-                <div className="chart-container">
-                <PriceHistogram
-                  originalListing={originalListing}
-                  relatedListings={relatedListings}
-                />
-                </div>
-                <div className="chart-container">
-                                <BubbleChartD3
-                                  originalListing={originalListing}
-                                  relatedListings={relatedListings}
-                                />
-                </div>
+        <div className="charts-container">
+          <div className="chart-card-carousel">
+            <button 
+              className="carousel-arrow left-arrow" 
+              onClick={() => navigateCard('prev')}
+            >
+              &#8249;
+            </button>
+            
+            <div className="chart-card">
+              {chartComponents[activeCardIndex]}
+              <div className="carousel-indicators">
+                {chartComponents.map((_, index) => (
+                  <span 
+                    key={index} 
+                    className={`indicator ${index === activeCardIndex ? 'active' : ''}`}
+                    onClick={() => setActiveCardIndex(index)}
+                  />
+                ))}
               </div>
-
-              {/* -- Value Analysis -- */}
-              <div className="value-analysis">
-                <ValueAnalysis
-                  pricePercentile={pricePercentile}
-                  likesPercentile={likesPercentile}
-                  photosPercentile={photosPercentile}
-                />
-              </div>
-
-              {/* -- Raw Data Section -- */}
-              <div className="raw-data">
-                <h3>Raw Data:</h3>
-                <pre>{JSON.stringify(scrapeResult, null, 2)}</pre>
-              </div>
-            </>
-          ) : (
-            <div className="insufficient-data">Insufficient data to render the analysis.</div>
-          )}
-        </>
-      ) : (
-        <div className="no-results">No results found.</div>
-      )}
+            </div>
+            
+            <button 
+              className="carousel-arrow right-arrow" 
+              onClick={() => navigateCard('next')}
+            >
+              &#8250;
+            </button>
+          </div>
+          
+          <div className="value-analysis-container">
+            <h3>Value Analysis</h3>
+            <ValueAnalysis
+              originalListing={originalListing}
+              relatedListings={relatedListings}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

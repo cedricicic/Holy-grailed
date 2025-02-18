@@ -95,7 +95,7 @@ const NetworkChart = ({ data }) => {
       .data(nodesArray)
       .enter().append('circle')
       .attr('r', d => radiusScale(d.count))
-      .attr('fill', '#69b3a2')
+      .attr('fill', 'grey')
       .on('mouseover', showNodeTooltip)
       .on('mouseout', hideTooltip)
       .call(d3.drag()
@@ -112,6 +112,13 @@ const NetworkChart = ({ data }) => {
       .attr('text-anchor', 'middle')
       .attr('fill', '#333')
       .text(d => d.id);
+
+      svg.append('text')
+      .attr('x', 10)
+      .attr('y', 30)
+      .attr('font-size', '30px')
+      .attr('font-weight', 'bold')
+      .text('Network Chart');
 
     simulation.on('tick', () => {
       link.attr('x1', d => d.source.x)

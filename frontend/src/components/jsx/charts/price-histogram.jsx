@@ -61,7 +61,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
     svg.append("path")
       .datum(normalDist)
       .attr("fill", "none")
-      .attr("stroke", "#69b3a2")
+      .attr("stroke", "black")
       .attr("stroke-width", 2)
       .attr("d", line);
 
@@ -90,7 +90,7 @@ const StandardDeviationChart = ({ originalListing, relatedListings }) => {
     svg.append("text")
       .attr("x", x(originalPrice) + 5)
       .attr("y", 20)
-      .attr("fill", "red")
+      .attr("fill", "black")
       .attr("font-size", "12px")
       .text("Your Listing");
   }, [originalListing, relatedListings]);

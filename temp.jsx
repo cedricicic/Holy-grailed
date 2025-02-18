@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import RadarChart from './charts/radar.jsx'; 
 import NetworkChart from './charts/network.jsx';
@@ -10,6 +10,7 @@ import '../css/resultspage.css';
 const ResultsPage = () => {
   const location = useLocation();
   const scrapeResult = location.state?.scrapeResult;
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const calculatePercentile = (value, array) => {
     const sorted = [...array].sort((a, b) => a - b);
@@ -39,6 +40,31 @@ const ResultsPage = () => {
   const networkData = relatedListings?.map(item => ({
     labels: item.labels,
   }));
+
+  const charts = [
+    <RadarChart
+      pricePercentile={pricePercentile}
+      likesPercentile={likesPercentile}
+      photosPercentile={photosPercentile}
+    />,
+    <NetworkChart data={networkData} />,
+    <PriceHistogram
+      originalListing={originalListing}
+      relatedListings={relatedListings}
+    />,
+    <BubbleChartD3
+      originalListing={originalListing}
+      relatedListings={relatedListings}
+    />
+  ];
+
+  const handleNext = () => {
+    setActiveIndex((prevIndex) => (prevIndex + 1) % charts.length);
+  };
+
+  const handlePrev = () => {
+    setActiveIndex((prevIndex) => (prevIndex - 1 + charts.length) % charts.length);
+  };
 
   return (
     <div className="results-page">
@@ -73,28 +99,18 @@ const ResultsPage = () => {
 
               {/* -- Charts Section -- */}
               <div className="charts-section">
-                <div className="chart-container">
-                <RadarChart
-                  pricePercentile={pricePercentile}
-                  likesPercentile={likesPercentile}
-                  photosPercentile={photosPercentile}
-                />
+                <button className="nav-button prev" onClick={handlePrev}>&lt;</button>
+                <div className="charts-container">
+                  {charts.map((chart, index) => (
+                    <div
+                      key={index}
+                      className={`chart-container ${index === activeIndex ? 'active' : ''}`}
+                    >
+                      {chart}
+                    </div>
+                  ))}
                 </div>
-                <div className="chart-container">
-                  <NetworkChart data={networkData} />
-                </div>
-                <div className="chart-container">
-                <PriceHistogram
-                  originalListing={originalListing}
-                  relatedListings={relatedListings}
-                />
-                </div>
-                <div className="chart-container">
-                                <BubbleChartD3
-                                  originalListing={originalListing}
-                                  relatedListings={relatedListings}
-                                />
-                </div>
+                <button className="nav-button next" onClick={handleNext}>&gt;</button>
               </div>
 
               {/* -- Value Analysis -- */}

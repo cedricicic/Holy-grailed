@@ -1,76 +1,219 @@
+/* Results Page Layout */
 .results-page {
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: white;
+}
+
+.results-container {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Listing Info Panel */
+.listing-info-panel {
+  flex: 0 0 30%;
+  max-width: 30%;
 }
 
 .listing-card {
+  background: white;
+  overflow: hidden;
+}
+
+.listing-header {
+  padding: 1rem;
+}
+
+.listing-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.listing-details {
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+.listing-details p {
+  margin: 0.5rem 0;
+}
+
+.listing-details span {
+  font-weight: 500;
+  color: #666;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.actions {
   display: flex;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 1rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.listing-images {
-  flex: 1;
-  margin-right: 20px;
-}
-
-.listing-images img {
-  max-width: 100%;
-  border-radius: 8px;
-}
-
-.no-image {
-  text-align: center;
-  padding: 20px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-}
-
-.listing-info {
-  flex: 2;
-}
-
-.listing-info h2 {
-  margin-top: 0;
-}
-
-.actions button {
-  margin-right: 10px;
-  padding: 10px 20px;
+.primary-btn, .secondary-btn {
+  padding: 0.6rem;
   border: none;
-  border-radius: 5px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.charts-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 20px;
+
+.primary-btn {
+  background: #000000;
+  color: white;
 }
 
-.chart-container {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #f9f9f9;
+.primary-btn:hover {
+  background: #000000;
 }
 
-.value-analysis {
-  margin-bottom: 20px;
+.secondary-btn {
+  background: #ffffff;
+  color: #333;
 }
 
-.raw-data {
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 8px;
+.secondary-btn:hover {
+  background: white;
 }
 
-.insufficient-data, .no-results {
+/* Charts Container */
+.charts-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chart-card-carousel {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.chart-card {
+  flex: 1;
+  background: white;
+  padding: 1.5rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-arrow {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.left-arrow {
+  left: -20px;
+}
+
+.right-arrow {
+  right: -20px;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  gap: 0.5rem;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.indicator.active {
+  background: #000000;
+  transform: scale(1.2);
+}
+
+.value-analysis-container {
+  background: white;
+  padding: 1.5rem;
+}
+
+.value-analysis-container h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .results-container {
+    flex-direction: column;
+  }
+  
+  .listing-info-panel {
+    flex: auto;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 1.5rem;
+  }
+  
+  .left-arrow {
+    left: -16px;
+  }
+  
+  .right-arrow {
+    right: -16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .results-page {
+    padding: 1rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+}
+
+.no-results, .insufficient-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  font-size: 1.2rem;
+  color: #666;
   text-align: center;
-  padding: 20px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
+  background: white;
+  padding: 2rem;
 }
