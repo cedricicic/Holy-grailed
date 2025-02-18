@@ -163,8 +163,8 @@
 
 .search-button {
     background-color: rgb(255, 255, 255);
-    border: 1px solid #505050; /* Adds a border */
-    border-left: none; /* Prevents double border between input and button */
+    border: 1px solid #505050;
+    border-left: none; 
     color: rgb(0, 0, 0);
     padding: 0.6rem 1rem;
     border-radius: 0 3px 3px 0;

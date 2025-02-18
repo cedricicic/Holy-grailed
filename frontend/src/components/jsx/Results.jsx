@@ -6,6 +6,7 @@ import PriceHistogram from "./charts/price-histogram.jsx";
 import ValueAnalysis from "./charts/value-analysis.jsx";
 import BubbleChart from "./charts/bubble.jsx";
 import PriceTugOfWar from './charts/PriceTugOfWar.jsx'
+import Heatmap from './charts/heatmap.jsx'
 import "../css/resultspage.css";
 
 const ResultsPage = () => {
@@ -71,6 +72,10 @@ const ResultsPage = () => {
   originalListing={originalListing} 
   relatedListings={relatedListings} 
 />,
+    <Heatmap 
+    originalListing={originalListing} 
+    relatedListings={relatedListings} 
+  />,
   ];
 
   const navigateCard = (direction) => {

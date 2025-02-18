@@ -11,21 +11,19 @@ const RadarChart = ({ pricePercentile, likesPercentile, photosPercentile }) => {
   }, [pricePercentile, likesPercentile, photosPercentile]);
 
   return (
-    <>        <h2>Radar Chart</h2>
-        <div
-      id="radarChart"
-      ref={radarChartRef}
-      style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}
-    ></div>
+    <>
+      <h2>Radar Chart</h2>
+      <div
+        id="radarChart"
+        ref={radarChartRef}
+        style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}
+      ></div>
     </>
-
   );
 };
 
 const createRadarChart = (target, pricePercentile, likesPercentile, photosPercentile) => {
-
   target.innerHTML = '';
-
 
   const width = 300;
   const height = 300;
@@ -34,15 +32,12 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
   const centerX = width / 2;
   const centerY = height / 2;
 
-
   const svg = d3.select(target)
     .append('svg')
     .attr('width', '100%')
     .attr('height', '100%')
-
     .attr('viewBox', `-${extraMargin} -${extraMargin} ${width + extraMargin * 2} ${height + extraMargin * 2}`)
     .attr('preserveAspectRatio', 'xMidYMid meet');
-
 
   const tooltip = d3.select('body').append('div')
     .attr('class', 'radar-tooltip')
@@ -56,17 +51,16 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
     .style('opacity', 0)
     .style('z-index', 1000);
 
-
   const metrics = [
     { name: 'Price Competitiveness', value: 100 - parseFloat(pricePercentile) },
     { name: 'Likeability', value: parseFloat(likesPercentile) },
     { name: 'Label Effectiveness', value: 65 },
-    { name: 'Photos Appeal', value: parseFloat(photosPercentile) }
+    { name: 'Photos Appeal', value: Math.min(parseFloat(photosPercentile) * 1.1, 100) }
   ];
 
   const angleSlice = (Math.PI * 2) / metrics.length;
 
-
+  // Draw concentric circles and percentage labels (centered)
   [0.2, 0.4, 0.6, 0.8, 1].forEach(r => {
     svg.append('circle')
       .attr('cx', centerX)
@@ -86,7 +80,6 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
       .text(`${r * 100}%`);
   });
 
-
   metrics.forEach((d, i) => {
     const angle = i * angleSlice - Math.PI / 2;
     const lineEnd = {
@@ -102,7 +95,6 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
       .attr('stroke', '#bbb')
       .attr('stroke-width', 0.5);
 
-
     const labelDistance = radius + 15;
     const labelX = centerX + labelDistance * Math.cos(angle);
     const labelY = centerY + labelDistance * Math.sin(angle);
@@ -110,32 +102,22 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
     svg.append('text')
       .attr('x', labelX)
       .attr('y', labelY)
-      .attr('text-anchor', () => {
-        if (angle === -Math.PI / 2) return 'middle';
-        if (angle < Math.PI / 2 && angle > -Math.PI / 2) return 'start';
-        return 'end';
-      })
-      .attr('alignment-baseline', () => {
-        if (angle === Math.PI / 2 || angle === -Math.PI / 2) return 'middle';
-        if (angle < 0) return 'baseline';
-        return 'hanging';
-      })
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
       .attr('font-size', '9px')
       .attr('fill', 'black')
       .text(d.name);
   });
 
-
   const radarPoints = metrics.map((d, i) => {
     const angle = i * angleSlice - Math.PI / 2;
     return {
-      x: centerX + (d.value / 150) * radius * Math.cos(angle),
-      y: centerY + (d.value / 150) * radius * Math.sin(angle),
+      x: centerX + (d.value / 100) * radius * Math.cos(angle),
+      y: centerY + (d.value / 100) * radius * Math.sin(angle),
       value: d.value,
       name: d.name
     };
   });
-
 
   const lineGenerator = d3.line()
     .x(d => d.x)
@@ -165,7 +147,6 @@ const createRadarChart = (target, pricePercentile, likesPercentile, photosPercen
         tooltip.style('opacity', 0);
       });
   });
-
 };
 
 export default RadarChart;

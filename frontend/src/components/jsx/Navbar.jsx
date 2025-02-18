@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../css/navbar.css';
 
 const Navbar = () => {
@@ -129,7 +129,7 @@ const Navbar = () => {
         
         <div className="navbar-actions">
           <a href="https://www.grailed.com/" className="action-button">FIND MORE</a>
-          <a href="/read">READ</a>
+          <Link to="/read">READ</Link>
           <a href="https://cedricleung.ca/" className="signup-button">AUTHOR</a>
         </div>
       </div>

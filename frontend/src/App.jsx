@@ -4,8 +4,8 @@ import RecentlyViewed from "./components/jsx/RecentlyViewed.jsx"
 import Hero from "./components/jsx/Hero.jsx";
 import Navbar from "./components/jsx/navbar.jsx";
 import Results from "./components/jsx/Results.jsx";
-import RecentSearches from "./components/jsx/RecentSearches.jsx";
 import Feedback from './components/jsx/Feedback.jsx';
+import Read from './components/jsx/Read.jsx'
 
 function Home() {
   return (
@@ -13,6 +13,16 @@ function Home() {
       <Navbar />
       <Hero />
       <RecentlyViewed />
+    </>
+  );
+}
+
+
+function ReadPage() {
+  return (
+    <>
+      <Navbar />
+      <Read />
     </>
   );
 }
@@ -51,6 +61,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/resultspage" element={<ResultsPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/read" element={<ReadPage />} />
       </Routes>
     </>
   );
