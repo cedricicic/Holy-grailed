@@ -196,12 +196,12 @@ const ResultsPage = () => {
 
             <div className="seller-section">
               <p>
-                <strong>Cedric Leung</strong>
+                <strong>Made by Cedric Leung </strong>
               </p>
               <p>
                 Submit your feedback · <a href="#/feedback">Here</a>
               </p>
-              <p>Also, I'm curretly looking for summer 2025 internships :)</p>
+
               <button
                 className="follow-btn"
                 onClick={() =>
