@@ -13,7 +13,7 @@ const launchBrowser = async () => {
   } else {
     console.log("Launching headless Puppeteer instance...");
     return await puppeteer.launch({
-      headless: true, // Changed to true for headless operation
+      headless: true,
       defaultViewport: {
         width: 1920,
         height: 1080
@@ -21,9 +21,9 @@ const launchBrowser = async () => {
       args: [
         "--no-sandbox", 
         "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage", // Prevents crashes in Docker containers
-        "--disable-gpu", // Optimize for headless 
-        "--window-size=1920,1080" // Ensure large viewport
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--window-size=1920,1080"
       ],
     });
   }
@@ -45,7 +45,7 @@ const ensurePageLoaded = async (page, timeout = 10000) => {
   await page.waitForFunction(() => document.readyState === "complete", { timeout });
   
   // Wait a bit for React to render
-  await page.waitForTimeout(1000);
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
   // Check if we need to intercept any anti-bot protection
   await handleAntiBotProtection(page);
@@ -61,6 +61,16 @@ const handleAntiBotProtection = async (page) => {
     'Connection': 'keep-alive',
     'Upgrade-Insecure-Requests': '1'
   });
+  
+  // Add human-like mouse movements
+  await page.mouse.move(
+    Math.random() * 800,
+    Math.random() * 600,
+    { steps: 5 }
+  );
+  
+  // Add random delays between actions
+  await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
   
   // Check for common bot protection elements and handle them
   const protectionSelectors = [
@@ -182,7 +192,7 @@ const handlePopups = async (page) => {
           document.querySelectorAll(sel).forEach((btn) => btn.click());
         }, selector);
         // Wait a moment after closing popup
-        await page.waitForTimeout(500);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
   } catch (e) {
@@ -216,52 +226,52 @@ const applyFilter = async (page, filterType, value) => {
     }
 
     if (filterType.toLowerCase() === "condition") {
+      // Validate condition before proceeding
+      const validConditions = new Set([
+        "new/ never worn",
+        "gently used",
+        "used",
+        "very worn"
+      ]);
+      
+      if (!validConditions.has(value.toLowerCase())) {
+        console.log(`Invalid condition filter: ${value}`);
+        return;
+      }
+
       if (value.toLowerCase() === "new") {
         value = "new/ never worn";
       }
 
       const conditionFound = await page.evaluate(async (value) => {
+        // Define condition index map
+        const conditionIndexMap = {
+          "new/ never worn": 1,
+          "gently used": 2,
+          "used": 3,
+          "very worn": 4
+        };
+        
         // Try multiple selector patterns for condition filters
         const possibleSelectors = [
-          // Original selector
-          "#feed > div > div.feed-and-filters > div.left > div > div:nth-child(7) > div.Collapsible_collapsibleContent__CZrnt > div > div > ul > li:nth-child({index}) > div > input",
+          // Original selector with dynamic index
+          (index) => `#feed > div > div.feed-and-filters > div.left > div > div:nth-child(7) > div.Collapsible_collapsibleContent__CZrnt > div > div > ul > li:nth-child(${index}) > div > input`,
           // More generic selectors
-          ".filters-section:has(h3:contains('Condition')) input[value='{value}']",
-          "[data-cy='condition-filter-{value}']",
-          "input[name='condition'][value='{value}']",
+          () => `.filters-section:has(h3:contains('Condition')) input[value='${value}']`,
+          () => `[data-cy='condition-filter-${value.replace(/ /g, "-")}']`,
+          () => `input[name='condition'][value='${value}']`,
           // Try finding by label text
-          "label:contains('{value}') input"
+          () => `label:contains('${value}') input`
         ];
 
-        const conditionNames = [
-          "new/ never worn",
-          "gently used",
-          "used",
-          "very worn",
-          "not specified",
-        ];
-
+        // Get index for the condition
+        const index = conditionIndexMap[value.toLowerCase()] || 1;
+        
         // Try to find condition filter with any selector pattern
-        for (const baseSelector of possibleSelectors) {
-          // Try direct value match first
-          const valueSelector = baseSelector.replace('{value}', value.toLowerCase());
-          const valueCheckbox = document.querySelector(valueSelector);
-          
-          if (valueCheckbox) {
-            valueCheckbox.click();
-            return true;
-          }
-          
-          // Try indexed approach
-          const conditionMap = {};
-          conditionNames.forEach((name, idx) => {
-            conditionMap[name.toLowerCase()] = baseSelector.replace('{index}', idx + 1);
-          });
-
-          const selector = conditionMap[value.toLowerCase()];
-          if (!selector) continue;
-
+        for (const selectorFn of possibleSelectors) {
+          const selector = selectorFn(index);
           const checkbox = document.querySelector(selector);
+          
           if (checkbox) {
             // If there's a collapsed section, expand it
             const collapsible = checkbox.closest(".Collapsible-module__collapsibleContent___KpYrl, [data-cy='collapsible-content']");
@@ -297,7 +307,7 @@ const applyFilter = async (page, filterType, value) => {
         });
         
         // Additional wait for React to update the DOM
-        await page.waitForTimeout(1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } else {
         console.log(`Could not find condition filter option: ${value}`);
       }
@@ -335,7 +345,7 @@ const gatherListingLinks = async (page) => {
     
     // Scroll down smoothly to mimic human behavior
     await page.evaluate("window.scrollBySmooth(800)");
-    await page.waitForTimeout(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
     await page.evaluate("window.scrollBySmooth(800)");
     
     // Wait for new content to load
@@ -357,6 +367,16 @@ const gatherListingLinks = async (page) => {
 
     // Extract all links
     const newLinks = await page.evaluate(() => {
+      // Try to find specific brand links if we're looking for a specific brand
+      const brandLinks = Array.from(document.querySelectorAll(
+        'a[href*="/listings/"][href*="-maison-margiela"]'
+      )).map(link => link.href);
+      
+      if (brandLinks.length > 0) {
+        return brandLinks;
+      }
+      
+      // Otherwise, use general selectors
       const selectors = [
         '.feed-item a', 
         '.listing-item a', 
@@ -422,7 +442,7 @@ const ensureReactContent = async (page) => {
   
   // If no selectors found, try waiting a bit more and check for any relevant content
   console.log("No specific React content found, waiting for general page content...");
-  await page.waitForTimeout(3000);
+  await new Promise(resolve => setTimeout(resolve, 3000));
   
   const contentCount = await page.evaluate(() => {
     return document.querySelectorAll('a[href*="/listings/"]').length;
@@ -508,27 +528,19 @@ const scrapeGrailedListing = async (listingUrl) => {
     const condition = originalListingDetails.cond;
     console.log(`Found listing condition: ${condition}`);
 
-    // Navigate to category page using breadcrumbs
+    // Navigate to category page using breadcrumbs - updated logic
     console.log("Attempting to navigate to category page via breadcrumbs...");
     const hasBreadcrumb = await page.evaluate(() => {
-      // Try multiple selectors for breadcrumbs
-      const selectors = [
-        "nav.Breadcrumbs_breadcrumbs__9ol0k ol", 
-        ".breadcrumbs ol",
-        "[data-cy='breadcrumbs'] ol",
-        "ol.breadcrumb"
-      ];
-      
-      for (const selector of selectors) {
-        const ol = document.querySelector(selector);
-        if (!ol) continue;
+      const categoryLinks = Array.from(document.querySelectorAll(
+        "nav.Breadcrumbs_breadcrumbs__9ol0k a, [data-cy='breadcrumbs'] a"
+      )).filter(a => 
+        !a.href.includes("/listings/") &&
+        !a.textContent.includes("Home")
+      );
         
-        const links = Array.from(ol.querySelectorAll('li a')).filter(a => a.href && !a.href.includes('/listings/'));
-        if (links.length >= 1) {
-          console.log(`Found breadcrumb, clicking: ${links[links.length - 1].textContent}`);
-          links[links.length - 1].click();
-          return true;
-        }
+      if (categoryLinks.length > 0) {
+        categoryLinks[categoryLinks.length - 1].click();
+        return true;
       }
       return false;
     });
@@ -570,6 +582,13 @@ const scrapeGrailedListing = async (listingUrl) => {
       page.waitForFunction('document.readyState === "complete"', { timeout: 10000 })
     ]).catch((e) => {
       console.log("Navigation timeout, continuing anyway:", e.message);
+    });
+    
+    // Add explicit wait after navigation for product cards
+    await page.waitForSelector('.feed-item, [data-cy="product-card"]', {
+      timeout: 10000
+    }).catch(() => {
+      console.log("Timeout waiting for product cards, continuing anyway");
     });
     
     // Make sure the page has loaded
