@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import RadarChart from "./charts/radar.jsx";
 import NetworkChart from "./charts/network.jsx";
 import PriceHistogram from "./charts/price-histogram.jsx";
@@ -53,29 +54,68 @@ const ResultsPage = () => {
     labels: item.labels,
   }));
 
+  // Card wrapper component with Framer Motion
+  const ChartCard = ({ children, title }) => (
+    <motion.div 
+      className="chart-card-wrapper"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ 
+        scale: 1.02,
+        boxShadow: "0 10px 20px rgba(0,0,0,0.15)" 
+      }}
+    >
+      <motion.div 
+        className="chart-card-header"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <h3>{title}</h3>
+      </motion.div>
+      <motion.div className="chart-card-content">
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+
   const chartComponents = [
-    <RadarChart
-      pricePercentile={pricePercentile}
-      likesPercentile={likesPercentile}
-      photosPercentile={photosPercentile}
-    />,
-    <NetworkChart data={networkData} />,
-    <PriceHistogram
-      originalListing={originalListing}
-      relatedListings={relatedListings}
-    />,
-    <BubbleChart
-      originalListing={originalListing}
-      relatedListings={relatedListings}
-    />,
-    <PriceTugOfWar 
-  originalListing={originalListing} 
-  relatedListings={relatedListings} 
-/>,
-    <Heatmap 
-    originalListing={originalListing} 
-    relatedListings={relatedListings} 
-  />,
+    <ChartCard title="Radar Analysis">
+      <RadarChart
+        pricePercentile={pricePercentile}
+        likesPercentile={likesPercentile}
+        photosPercentile={photosPercentile}
+      />
+    </ChartCard>,
+    <ChartCard title="Network Analysis">
+      <NetworkChart data={networkData} />
+    </ChartCard>,
+    <ChartCard title="Price Distribution">
+      <PriceHistogram
+        originalListing={originalListing}
+        relatedListings={relatedListings}
+      />
+    </ChartCard>,
+    <ChartCard title="Market Position">
+      <BubbleChart
+        originalListing={originalListing}
+        relatedListings={relatedListings}
+      />
+    </ChartCard>,
+    <ChartCard title="Price Comparison">
+      <PriceTugOfWar 
+        originalListing={originalListing} 
+        relatedListings={relatedListings} 
+      />
+    </ChartCard>,
+    <ChartCard title="Market Heatmap">
+      <Heatmap 
+        originalListing={originalListing} 
+        relatedListings={relatedListings} 
+      />
+    </ChartCard>,
   ];
 
   const navigateCard = (direction) => {
@@ -227,43 +267,81 @@ const ResultsPage = () => {
 
         <div className="charts-container">
           <div className="chart-card-carousel">
-            <button
+            <motion.button
               className="carousel-arrow left-arrow"
               onClick={() => navigateCard("prev")}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
             >
               &#8249;
-            </button>
+            </motion.button>
 
             <div className="chart-card">
-              {chartComponents[activeCardIndex]}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCardIndex}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {chartComponents[activeCardIndex]}
+                </motion.div>
+              </AnimatePresence>
+              
               <div className="carousel-indicators">
                 {chartComponents.map((_, index) => (
-                  <span
+                  <motion.span
                     key={index}
                     className={`indicator ${
                       index === activeCardIndex ? "active" : ""
                     }`}
                     onClick={() => setActiveCardIndex(index)}
+                    whileHover={{ scale: 1.5 }}
+                    whileTap={{ scale: 0.9 }}
+                    animate={index === activeCardIndex ? 
+                      { scale: 1.2, backgroundColor: 'black' } : 
+                      { scale: 1, backgroundColor: '#ccc' }
+                    }
+                    transition={{ duration: 0.2 }}
                   />
                 ))}
               </div>
             </div>
 
-            <button
+            <motion.button
               className="carousel-arrow right-arrow"
               onClick={() => navigateCard("next")}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
             >
               &#8250;
-            </button>
+            </motion.button>
           </div>
 
-          <div className="value-analysis-container">
-            <h2>Value Analysis</h2>
+          <motion.div 
+            className="value-analysis-container"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.3,
+              ease: "easeOut"
+            }}
+            whileHover={{ boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              Value Analysis
+            </motion.h2>
             <ValueAnalysis
               originalListing={originalListing}
               relatedListings={relatedListings}
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

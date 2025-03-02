@@ -110,6 +110,39 @@
   min-height: 400px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.chart-card-wrapper {
+  background: white;
+  /* border-radius: 12px; */
+  overflow: hidden;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card-header {
+  padding: 16px 20px;
+  background: linear-gradient(to right, #f7f7f7, #ffffff);
+  border-bottom: 1px solid #eaeaea;
+}
+
+.chart-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-card-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .carousel-arrow {
@@ -151,16 +184,47 @@
   background: #ddd;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
+}
+
+.indicator:after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.indicator:hover:after {
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 .indicator.active {
   background: #000000;
   transform: scale(1.2);
+  /* box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); */
 }
 
 .value-analysis-container {
   background: white;
   padding: 1.5rem;
+  /* border-radius: 12px; */
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
+  transition: all 0.3s ease;
+}
+
+.value-analysis-container h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  /* border-bottom: 2px solid #f0f0f0; */
 }
 
 .value-analysis-container h3 {
